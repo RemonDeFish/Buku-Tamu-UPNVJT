@@ -1,28 +1,20 @@
 <?php
 
-session_start();
+$host = "localhost";
+$username = "root";
+$password = "MemekAyamMySQL911";
+$database = "sippk_db";
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'raymond');
-define('DB_PASS', '24081010160');
-define('DB_NAME', 'buku_tamu');
+$conn = new mysqli(
+    $host,
+    $username,
+    $password,
+    $database
+);
 
-define('DB_CHARSET', 'utf8mb4');
-
-define('APP_NAME', 'Buku Tamu UPNVJT');
-
-try {
-    $conn = new PDO(
-        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET,
-        DB_USER,
-        DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $e) {
-    die('Database connection failed: ' . $e->getMessage());
+if ($conn->connect_error) {
+    die("Koneksi database gagal: " . $conn->connect_error);
 }
 
-function escape($value)
-{
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-}
+$conn->set_charset("utf8mb4");
+?>
