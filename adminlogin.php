@@ -1,56 +1,78 @@
 <?php
-// Memulai session untuk mencatat login admin
 session_start();
 require_once 'config.php';
 
 $error_message = "";
 
-// Blok penangkap data yang dikirim oleh Form POST HTML
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
-    
-    // Tangkap token g-recaptcha-response dari Google
-    $recaptcha_response = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '';
 
+    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
     if (empty($recaptcha_response)) {
         $error_message = "Silakan centang verifikasi bahwa Anda bukan robot.";
     } else {
-        if (!empty($email) && !empty($password)) {
-            $stmt = $conn->prepare("
-                SELECT
-                    id,
-                    nama_lengkap,
-                    email,
-                    password
-                FROM admins
-                WHERE email = ?
-                LIMIT 1
-            ");
+        $stmt = $conn->prepare("
+            SELECT
+                id,
+                nama_lengkap,
+                email,
+                password
+            FROM admins
+            WHERE email = ?
+            LIMIT 1
+        ");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
 
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
+        $result = $stmt->get_result();
 
-            $result = $stmt->get_result();
+        if ($result->num_rows === 1) {
 
-            if ($result->num_rows === 1) {
-                $admin = $result->fetch_assoc();
-                if (password_verify($password, $admin['password'])) {
-                    session_regenerate_id(true);
-                    $_SESSION['admin_id'] = $admin['id'];
-                    $_SESSION['admin_name'] = $admin['nama_lengkap'];
-                    $_SESSION['admin_email'] = $admin['email'];
+            $admin = $result->fetch_assoc();
 
-                    header("Location: adminotp.php");
-                    exit();
-                } else {
-                    $error_message = "Password salah.";
+            if (password_verify($password, $admin['password'])) {
+
+                session_regenerate_id(true);
+
+                $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['admin_name'] = $admin['nama_lengkap'];
+                $_SESSION['admin_email'] = $admin['email'];
+
+                $otp = str_pad(rand(0,9999), 4, '0', STR_PAD_LEFT);
+
+                $expired = date(
+                    'Y-m-d H:i:s',
+                    strtotime('+5 minutes')
+                );
+
+                $otpStmt = $conn->prepare("
+                    UPDATE admins
+                    SET
+                        otp_code = ?,
+                        otp_expired = ?
+                    WHERE id = ?
+                ");
+
+                if (!$otpStmt) {
+                    die("Prepare gagal: " . $conn->error);
                 }
+
+                $otpStmt->bind_param(
+                    "ssi",
+                    $otp,
+                    $expired,
+                    $admin['id']
+                );
+
+                $otpStmt->execute();
+                header("Location: adminotp.php");
+                exit();
             } else {
-                $error_message = "Email tidak ditemukan.";
+                $error_message = "Password salah.";
             }
         } else {
-            $error_message = "Email dan Password tidak boleh kosong.";
+            $error_message = "Email tidak ditemukan.";
         }
     }
 }

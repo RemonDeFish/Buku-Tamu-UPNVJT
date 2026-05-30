@@ -1,39 +1,80 @@
 <?php
-// Memulai session untuk memvalidasi status login admin
 session_start();
+require_once 'config.php';
+
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: adminlogin.php");
+    exit();
+}
 
 $error_message = "";
 
-// Menangkap kiriman kode OTP ketika tombol "Verifikasi" diklik
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Menggabungkan array input otp menjadi satu string (misal: "1234")
+$stmt = $conn->prepare("
+    SELECT
+        otp_code,
+        otp_expired
+    FROM admins
+    WHERE id = ?
+");
+
+$stmt->bind_param(
+    "i",
+    $_SESSION['admin_id']
+);
+
+$stmt->execute();
+
+$result = $stmt->get_result();
+$admin = $result->fetch_assoc();
+
+$debugOtp = $admin['otp_code'] ?? '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     if (isset($_POST['otp']) && is_array($_POST['otp'])) {
+
         $otp_code = implode("", $_POST['otp']);
-        
-        // Validasi panjang dan karakter OTP (misal: 4 digit angka)
+
         if (!preg_match('/^\d{4}$/', $otp_code)) {
+
             $error_message = "Kode OTP harus terdiri dari 4 digit angka.";
+
         } else {
-            // Batasi jumlah percobaan OTP untuk mencegah brute-force
-            if (!isset($_SESSION['otp_attempts'])) {
-                $_SESSION['otp_attempts'] = 0;
-            }
-            if ($_SESSION['otp_attempts'] >= 5) {
-                $error_message = "Terlalu banyak percobaan. Silakan coba lagi nanti.";
+
+            if (
+                $otp_code === $admin['otp_code']
+                &&
+                strtotime($admin['otp_expired']) > time()
+            ) {
+
+                $_SESSION['otp_verified'] = true;
+
+                $clearOtp = $conn->prepare("
+                    UPDATE admins
+                    SET
+                        otp_code = NULL,
+                        otp_expired = NULL
+                    WHERE id = ?
+                ");
+
+                $clearOtp->bind_param(
+                    "i",
+                    $_SESSION['admin_id']
+                );
+
+                $clearOtp->execute();
+
+                header("Location: dashboard.php");
+                exit();
+
             } else {
-                if (isset($_SESSION['otp']) && $otp_code === $_SESSION['otp']) {
-                    unset($_SESSION['otp_attempts']); // reset attempts on success
-                    header("Location: dashboard.php");
-                    exit();
-                } else {
-                    $_SESSION['otp_attempts'] += 1;
-                    $error_message = "Kode OTP salah goblok.";
-                }
+
+                $error_message = "Kode OTP salah atau sudah kedaluwarsa.";
+
             }
-        }
         }
     }
-
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -83,6 +124,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h2 class="w-full text-center font-bold text-[#121212] text-xl lg:text-[22px] tracking-wide mb-1">
                 Verifikasi OTP
             </h2>
+            <p class="text-xs text-blue-600 text-center">
+                OTP Testing:
+                <?php echo htmlspecialchars($debugOtp); ?>
+            </p>
             <p class="text-xs text-gray-500 font-medium text-center mb-6">
                 Kami telah mengirim kode OTP ke E-mail anda
             </p>
