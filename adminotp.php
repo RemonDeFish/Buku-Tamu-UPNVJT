@@ -40,13 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error_message = "Kode OTP harus terdiri dari 4 digit angka.";
 
         } else {
+            if (!isset($_SESSION['otp_attempts'])) {
+                    $_SESSION['otp_attempts'] = 0;
+                }
 
-            if (
+            if ($_SESSION['otp_attempts'] >= 5) {
+                $error_message =
+                    "Terlalu banyak percobaan OTP.";
+            }
+            else if (
                 $otp_code === $admin['otp_code']
                 &&
                 strtotime($admin['otp_expired']) > time()
             ) {
-
+                unset($_SESSION['otp_attempts']);
                 $_SESSION['otp_verified'] = true;
 
                 $clearOtp = $conn->prepare("

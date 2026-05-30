@@ -1,4 +1,8 @@
 <?php
+require_once 'config.php';
+
+$success_message = "";
+$error_message = "";
 // Bagian ini disiapkan untuk Backend PHP Anda untuk memproses form saat di-submit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Ambil data dari atribut name masing-masing input
@@ -12,6 +16,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $maksud_tujuan     = $_POST['maksud_tujuan'];
 
     // Di sini backend tinggal membuat query INSERT INTO ke MySQL...
+    $stmt = $conn->prepare("
+        INSERT INTO kunjungan
+        (
+            nama_pengunjung,
+            no_telp,
+            instansi,
+            keperluan,
+            tujuan,
+            tanggal,
+            waktu_mulai,
+            waktu_selesai,
+            status
+        )
+        VALUES
+        (
+            ?, ?, ?, ?, ?, ?, ?, ?, 'menunggu'
+        )
+    ");
+
+    $stmt->bind_param(
+        "ssssssss",
+        $nama_tamu,
+        $no_telp,
+        $asal_instansi,
+        $keperluan,
+        $maksud_tujuan,
+        $tanggal_kunjungan,
+        $waktu_mulai,
+        $waktu_selesai
+    );
+
+    if ($stmt->execute()) {
+
+        $success_message =
+            "Data kunjungan berhasil disimpan.";
+
+    } else {
+
+        $error_message =
+            "Gagal menyimpan data kunjungan.";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -70,7 +115,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h1 class="w-full text-center font-bold text-[#121212] text-xl md:text-2xl tracking-wide mb-8 border-b pb-4 border-gray-100">
                 Form Tamu
             </h1>
+            <?php if (!empty($success_message)): ?>
+            <div class="mb-4 p-3 rounded-lg bg-green-100 text-green-700">
+                <?php echo $success_message; ?>
+            </div>
+            <?php endif; ?>
 
+            <?php if (!empty($error_message)): ?>
+            <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700">
+                <?php echo $error_message; ?>
+            </div>
+            <?php endif; ?>
             <form action="formtamu.php" method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 items-stretch">
                     
