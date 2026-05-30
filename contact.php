@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="flex items-center gap-6 md:gap-11">
                 <div class="hidden md:flex items-center gap-11 font-normal text-black text-base">
                     <a href="index.php" class="hover:text-[#6a5750] transition">Home</a>
-                    <a href="#" class="hover:text-[#6a5750] transition">Status Kunjungan</a>
+                    <a href="statuskunjungan.php" class="hover:text-[#6a5750] transition">Status Kunjungan</a>
                     <a href="contact.php" class="text-[#6a5750] font-semibold border-b-4 rounded-sm border-[#6a5750] pb-1">Contact Us?</a>
                 </div>
                 <a href="adminlogin.php" class="inline-block bg-[#6a5750] hover:bg-[#574741] text-white font-normal text-base px-5 py-2 rounded transition shadow-sm">
