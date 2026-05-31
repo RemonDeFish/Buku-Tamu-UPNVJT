@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="w-full min-h-screen bg-white font-montserrat antialiased relative flex justify-center items-center overflow-x-hidden p-4 md:p-8">
 
-    <div class="absolute inset-0 z-0 opacity-100">
+    <div class="absolute inset-0 z-0 opacity-[0.12]">
         <img class="w-full h-full object-cover" src="image/batik.png" alt="Batik Background" />
     </div>
 
