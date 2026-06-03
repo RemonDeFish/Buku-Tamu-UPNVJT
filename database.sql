@@ -104,6 +104,6 @@ VALUES
 -- Contoh data pertemuan
 INSERT INTO kunjungan (nama_pengunjung, no_telp, instansi, keperluan, tujuan, tanggal, waktu_mulai, waktu_selesai, status)
 VALUES
-(2, 'Dewi Rahayu',    'PT Nusantara Jaya', 'Diskusi kerja sama magang',       'Prof. Dr. Hendra Muani', '2025-07-10', '09:00:00', '10:00:00', 'disetujui'),
-(2, 'Ahmad Fauzi',   'Dimas Pendidikan',  'Sosialisasi program beasiswa',    'Dr. Siti Musfota, M.Pd',   '2025-07-12', '13:00:00', '14:30:00', 'menunggu'),
-(2, 'Widya Kartika',  'Yayasan Gak Peduli',    'Penyerahan bantuan beasiswa',     'Rektor',                   '2025-07-15', '10:00:00', '11:00:00', 'menunggu');
+('Dewi Rahayu', '081234567890',    'PT Nusantara Jaya', 'Diskusi kerja sama magang',       'Prof. Dr. Hendra Muani', '2025-07-10', '09:00:00', '10:00:00', 'disetujui'),
+('Ahmad Fauzi', '081234567891',   'Dimas Pendidikan',  'Sosialisasi program beasiswa',    'Dr. Siti Musfota, M.Pd',   '2025-07-12', '13:00:00', '14:30:00', 'menunggu'),
+('Widya Kartika', '081234567892',  'Yayasan Gak Peduli',    'Penyerahan bantuan beasiswa',     'Rektor',                   '2025-07-15', '10:00:00', '11:00:00', 'menunggu');

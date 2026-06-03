@@ -1,66 +1,35 @@
 <?php
-// ==========================================
-// --- LOGIKA BACKEND PHP & PAGINATION ---
-// ==========================================
+require_once 'config.php';
 
-$jumlah_data_per_halaman = 5; // Mengatur 5 baris data per halaman
+$data_kunjungan = [];
 
-// Ambil nomor halaman dari URL (Contoh: kunjungan_tamu.php?page=2)
-$halaman_aktif = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
-if ($halaman_aktif < 1) { 
-    $halaman_aktif = 1; 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $nama = trim($_POST['nama']);
+    $no_telp = trim($_POST['no_telp']);
+
+    $stmt = $conn->prepare("
+        SELECT *
+        FROM kunjungan
+        WHERE nama_pengunjung = ?
+        AND no_telp = ?
+        ORDER BY created_at DESC
+    ");
+
+    $stmt->bind_param(
+        "ss",
+        $nama,
+        $no_telp
+    );
+
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $data_kunjungan[] = $row;
+    }
 }
-
-// Hitung mulai dari baris data ke berapa (Offset) untuk query database
-$offset = ($halaman_aktif - 1) * $jumlah_data_per_halaman;
-
-// --- DUMMY TOTAL DATA ---
-// Ubah angka 8 ini dengan hasil "SELECT COUNT(*) FROM nama_tabel" dari database Anda nanti
-$total_data = 8; 
-
-// Hitung total halaman yang tersedia
-$total_halaman = ceil($total_data / $jumlah_data_per_halaman);
-
-
-// --- DUMMY DATA KUNJUNGAN ---
-// (Di masa mendatang, pastikan Backend Anda menyertakan key "id" dari database pada tiap array)
-$dummy_kunjungan = [
-    [
-        "id" => 1,
-        "nomor_antrian" => "#SPK-20260529-001",
-        "keperluan" => "Kunjungan Dinas",
-        "status" => "In Progress",
-        "tanggal_waktu" => "30 Februari, 2026 14:30-15:00"
-    ],
-    [
-        "id" => 2,
-        "nomor_antrian" => "#SPK-20260529-002",
-        "keperluan" => "Tata Usaha",
-        "status" => "Complete",
-        "tanggal_waktu" => "12 Mei, 2026 24:00-01:00"
-    ],
-    [
-        "id" => 3,
-        "nomor_antrian" => "#SPK-20260529-003",
-        "keperluan" => "Janji Temu",
-        "status" => "Pending",
-        "tanggal_waktu" => "10 Januari, 2026 12:00-14:30"
-    ],
-    [
-        "id" => 4,
-        "nomor_antrian" => "#SPK-20260529-004",
-        "keperluan" => "HUMAS",
-        "status" => "Canceled",
-        "tanggal_waktu" => "20 Mei, 2026 11:00-01:00"
-    ],
-    [
-        "id" => 5,
-        "nomor_antrian" => "#SPK-20260529-005",
-        "keperluan" => "Menghadiri Acara",
-        "status" => "Rejected",
-        "tanggal_waktu" => "7 Maret, 2026 13:00-15:00"
-    ]
-];
 ?>
 <!DOCTYPE html>
 <html lang="id">

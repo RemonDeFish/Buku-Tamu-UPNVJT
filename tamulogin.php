@@ -108,12 +108,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                         <?php endif; ?>
 
-                        <form action="" method="POST" autocomplete="off" class="w-full flex flex-col gap-4">
+                        <form action="statuskunjungan.php" method="POST" autocomplete="off" class="w-full flex flex-col gap-4">
                             
                             <div class="w-full flex flex-col gap-1.5">
-                                <label class="text-xs font-semibold text-gray-400 font-roboto">Email</label>
-                                <input type="email" name="email" required placeholder="example@gmail.com" 
-                                    class="w-full h-[38px] px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 outline-none focus:border-[#6a5750] focus:ring-1 focus:ring-[#6a5750]/35 transition placeholder-gray-300 shadow-sm bg-white/90" />
+                                <label class="text-xs font-semibold text-gray-400 font-roboto">Nama</label>
+                                <input
+                                    type="text"
+                                    name="nama"
+                                    placeholder="Nama Lengkap"
+                                    required
+                                >
+
+                                <input
+                                    type="text"
+                                    name="no_telp"
+                                    placeholder="Nomor Telepon"
+                                    required
+                                >
                             </div>
 
                             <button type="submit" class="w-full h-[38px] bg-[#6a5750] hover:bg-[#574741] text-white font-medium text-sm rounded-md shadow transition transform active:scale-95 flex items-center justify-center gap-2 mt-1">
