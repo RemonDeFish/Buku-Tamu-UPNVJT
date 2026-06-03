@@ -50,8 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="flex items-center gap-6 md:gap-11">
                 <div class="hidden md:flex items-center gap-11 font-normal text-black text-base">
-                    <a href="index.php" class="hover:text-[#6a5750] transition">Home</a>
-                    <a href="statuskunjungan.php" class="hover:text-[#6a5750] transition">Status Kunjungan</a>
+                    <a href="index.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Home</a>
+                    <a href="tamulogin.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Status Kunjungan</a>
                     <a href="contact.php" class="text-[#6a5750] font-semibold border-b-4 rounded-sm border-[#6a5750] pb-1">Contact Us?</a>
                 </div>
                 <a href="adminlogin.php" class="inline-block bg-[#6a5750] hover:bg-[#574741] text-white font-normal text-base px-5 py-2 rounded transition shadow-sm">
@@ -173,19 +173,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <footer class="relative w-full min-h-[140px] mt-auto z-10 flex flex-col justify-end overflow-hidden">
         <img class="absolute bottom-0 left-0 w-full h-[115%] object-cover z-0 pointer-events-none transform translate-y-6" src="image/vector-1.svg" alt="Footer Wave" />
+        
         <div class="relative z-10 w-full max-w-[1200px] mx-auto px-6 md:px-8 pb-6 flex flex-col gap-4">
             <div class="flex gap-3 justify-center md:justify-start">
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/linkedin-icon.svg" alt="Linkedin" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/instagram-icon.svg" alt="Instagram" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/youtube-icon.svg" alt="Youtube" /></a>
+                <a href="https://x.com/BillGates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
+                <a href="https://www.linkedin.com/in/williamhgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/linkedin-icon.svg" alt="Linkedin" /></a>
+                <a href="https://www.instagram.com/thisisbillgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/instagram-icon.svg" alt="Instagram" /></a>
+                <a href="https://www.youtube.com/billgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/youtube-icon.svg" alt="Youtube" /></a>
             </div>
             <div class="w-full h-[1px] bg-white opacity-20"></div>
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-normal text-white">
                 <p class="opacity-90">© 2026 SIPPK. All rights reserved.</p>
                 <div class="flex gap-6 md:gap-12">
-                    <a href="#" class="text-gray-200 hover:text-white transition">Privacy Policy</a>
-                    <a href="#" class="text-white hover:underline transition">Terms & Conditions</a>
+                    <a href="https://www.whatsapp.com/legal/privacy-policy?lang=id" class="text-gray-200 hover:text-white transition">Privacy Policy</a>
+                    <a href="https://www.whatsapp.com/legal/terms-of-service" class="text-white hover:underline transition">Terms & Conditions</a>
                 </div>
             </div>
         </div>
