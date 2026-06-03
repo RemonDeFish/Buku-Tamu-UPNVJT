@@ -11,19 +11,18 @@ $asal_halaman = (isset($_GET['from'])) ? $_GET['from'] : '';
 
 $id = (int)$_GET['id'];
 
+require_once 'config.php';
+
 $stmt = $conn->prepare("
-SELECT
-    v.visit_code,
-    t.full_name,
-    v.purpose,
-    v.status,
-    v.visit_date,
-    v.visit_time
-FROM visits v
-JOIN visitors t
-ON t.id = v.visitor_id
-WHERE v.id = ?
+SELECT *
+FROM kunjungan
+WHERE id = ?
 ");
+
+$stmt->bind_param("i",$id);
+$stmt->execute();
+
+$data_tiket = $stmt->get_result()->fetch_assoc();
 
 $stmt->bind_param("i",$id);
 $stmt->execute();
@@ -119,7 +118,7 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
                     <div class="flex flex-col">
                         <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nama</span>
                         <div class="bg-[#EAEAEA] inline-block px-8 py-2.5 rounded-none text-sm font-semibold text-gray-800 self-start min-w-[220px]">
-                            <?= $data_tiket['nama_tamu']; ?>
+                            <?= $data_tiket['nama_pengunjung']; ?>
                         </div>
                     </div>
 

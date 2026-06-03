@@ -50,7 +50,7 @@ $tanggal_display = $hari[date('w')] . ", " . date('j') . " " . $bulan[date('n')]
             <div class="flex items-center gap-6 md:gap-11">
                 <div class="hidden md:flex items-center gap-11 font-normal text-black text-base">
                     <a href="index.php" class="font-semibold text-[#6a5750] border-b-4 rounded-sm border-[#6a5750] pb-1">Home</a>
-                    <a href="#" class="hover:text-[#6a5750] transition">Cek Status Kunjungan</a>
+                    <a href="statuskunjungan.php" class="hover:text-[#6a5750] transition">Cek Status Kunjungan</a>
                     <a href="https://wa.me/6282261882303" class="hover:text-[#6a5750] transition">Contact Us?</a>
                 </div>
                 <a href="adminlogin.php" class="inline-block bg-[#6a5750] hover:bg-[#574741] text-white font-normal text-base px-5 py-2 rounded transition shadow-sm">

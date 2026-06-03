@@ -17,17 +17,30 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-if($result->num_rows > 0){
+require_once 'config.php';
 
+$stmt = $conn->prepare("
+SELECT *
+FROM kunjungan
+WHERE email = ?
+");
+
+$stmt->bind_param("s",$email);
+$stmt->execute();
+
+$data = $stmt->get_result()->fetch_assoc();
+
+if($data)
+{
     $_SESSION['tamu_email'] = $email;
+    $_SESSION['otp_tamu'] = rand(1000,9999);
 
     header("Location: tamuotp.php");
-    exit;
-
-}else{
-
+    exit();
+}
+else
+{
     $error_message = "Email tidak ditemukan.";
-
 }
 ?>
 <!DOCTYPE html>

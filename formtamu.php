@@ -49,8 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
 
-        $success_message =
-            "Data kunjungan berhasil disimpan.";
+        $id_kunjungan = $conn->insert_id;
+
+        header("Location: tiket.php?id=".$id_kunjungan);
+        exit();
 
     } else {
 
