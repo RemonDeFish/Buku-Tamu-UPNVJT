@@ -9,7 +9,7 @@ if (!isset($_SESSION['login_attempt'])) {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if ($_SESSION['login_attempt'] >= 5) {
+    if ($_SESSION['login_attempt'] >= 99) {
         $error_message =
             "Terlalu banyak percobaan login. Silakan coba lagi beberapa saat lagi.";
     } else {
@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         unset($_SESSION['otp_verified']);
                         $_SESSION['login_attempt'] = 0;
                         $otp = str_pad(random_int(0,9999),4,'0',STR_PAD_LEFT);
+                        require_once 'mail.php';
                         $expired = date(
                             'Y-m-d H:i:s',
                             strtotime(
@@ -76,9 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $admin['id']
                             );
                             if ($otpStmt->execute()) {
-                                header(
-                                    "Location: adminotp.php"
+                                kirimOTP(
+                                    $admin['email'],
+                                    $admin['nama_lengkap'],
+                                    $otp
                                 );
+                                header("Location: adminotp.php");
                                 exit();
                             } else {
                                 $error_message =

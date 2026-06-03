@@ -74,6 +74,11 @@ VALUES (
     'Administrator SIPPK',
     'admin@sippk.ac.id',
     '$2y$12$Eq93nm/Hj4puRZolXtEGaexAqF/I7ahT63N5p4FHnVc6imNq74DYK'
+),
+(
+    'Raymond Harsono Alim',
+    'raymondalim2@gmail.com',
+    '$2y$12$fHBiW4EBeXI3cQqv6mghlu4LxJctDF2W.5xchxsOnVeES6qDIsEZK'
 );
 
 -- Contoh user biasa
