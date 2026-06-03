@@ -3,7 +3,7 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
-
+//paten
 $id_kunjungan = isset($_GET['id'])
     ? (int) $_GET['id']
     : 0;

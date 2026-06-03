@@ -6,36 +6,136 @@ session_start();
 
 date_default_timezone_set('Asia/Jakarta');
 
+require_once 'config.php';
+
 $hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 $bulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 $tanggal_display = $hari[date('w')] . ", " . date('j') . " " . $bulan[date('n')] . " " . date('Y');
 
 $stats = [
-    'total' => 553,
-    'pending' => 120,
-    'today' => 89,
-    'approved' => 224
+    'total' => 0,
+    'pending' => 0,
+    'today' => 0,
+    'approved' => 0
 ];
 
-$kunjungan_mendatang = [
-    ['id' => 1, 'nama' => 'Amanda Putri', 'keperluan' => 'Kunjungan Dinas', 'tanggal' => '01 Juli 2026', 'waktu' => '11:00 - 12:00'],
-    ['id' => 2, 'nama' => 'Tono Siregar', 'keperluan' => 'Janji Temu', 'tanggal' => '22 Juli 2026', 'waktu' => '15:00 - 20:30'],
-    ['id' => 3, 'nama' => 'Remon Chin', 'keperluan' => 'Humas', 'tanggal' => '14 September 2026', 'waktu' => '23:00 - 12:00'],
-    ['id' => 4, 'nama' => 'Mas Amba', 'keperluan' => 'Menghadiri Acara', 'tanggal' => '18 Agustus 2026', 'waktu' => '01:30 - 06:00'],
-    ['id' => 5, 'nama' => 'Randy AK-47', 'keperluan' => 'Janji Temu', 'tanggal' => '30 Desember 2026', 'waktu' => '24:00 - 12:00'],
-    ['id' => 6, 'nama' => 'Christine Michelle', 'keperluan' => 'HIMA', 'tanggal' => '04 November 2026', 'waktu' => '03:00 - 04:00'],
-];
+$result = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+");
 
-$notifikasi = [
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Mas Amba mendaftarkan kunjungan.'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Keluhan sistem tiket dari Hilmi Fahrenheit.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Amanda Putri mengajukan kunjungan Dinas.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Christine Michelle mengirimkan bukti dokume..'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Tanya Jadwal - Tono Siregar (Universitas Airlan..'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Randy AK-47 mengajukan Janji Temu Rektorat.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Remon Chin mendaftarkan kunjungan Humas.']
-];
+$stats['total'] =
+    $result
+    ->fetch_assoc()['total'];
+
+$result = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+    WHERE status = 'menunggu'
+");
+
+$stats['pending'] =
+    $result
+    ->fetch_assoc()['total'];
+
+$result = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+    WHERE status = 'disetujui'
+");
+
+$stats['approved'] =
+    $result
+    ->fetch_assoc()['total'];
+
+$result = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+    WHERE status = 'ditolak'
+");
+
+$stats['rejected'] =
+    $result
+    ->fetch_assoc()['total'];
+
+$result = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+    WHERE status = 'selesai'
+");
+
+$stats['completed'] =
+    $result
+    ->fetch_assoc()['total'];
+
+$today = date('Y-m-d');
+
+$stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+    WHERE tanggal = ?
+");
+
+$stmt->bind_param(
+    "s",
+    $today
+);
+
+$stmt->execute();
+
+$stats['today'] =
+    $stmt
+    ->get_result()
+    ->fetch_assoc()['total'];
+
+$kunjungan_mendatang = [];
+
+$result = $conn->query("
+    SELECT *
+    FROM kunjungan
+    ORDER BY tanggal DESC,
+             waktu_mulai DESC
+    LIMIT 6
+");
+
+while ($row = $result->fetch_assoc()) {
+
+    $kunjungan_mendatang[] = [
+        'id' => $row['id'],
+        'nama' => $row['nama_pengunjung'],
+        'keperluan' => $row['keperluan'],
+        'tanggal' => date(
+            'd M Y',
+            strtotime($row['tanggal'])
+        ),
+        'waktu' =>
+            $row['waktu_mulai']
+            . ' - '
+            . $row['waktu_selesai']
+    ];
+}
+
+$notifikasi = [];
+
+$result = $conn->query("
+    SELECT *
+    FROM kunjungan
+    WHERE status = 'menunggu'
+    ORDER BY id DESC
+    LIMIT 10
+");
+
+while ($row = $result->fetch_assoc()) {
+
+    $notifikasi[] = [
+        'tipe' => 'kunjungan',
+        'judul' => 'Kunjungan Baru Terdeteksi',
+        'deskripsi' =>
+            $row['nama_pengunjung']
+            . ' mengajukan kunjungan.'
+    ];
+}
 
 $jumlah_notif = count($notifikasi);
 ?>
@@ -147,13 +247,48 @@ $jumlah_notif = count($notifikasi);
             <?php
             // --- LOGIKA DATA TREN WAKTU KUNJUNGAN ---
             $row_tren = [
-                'blur_1' => 110, 
-                'blok_1' => 110, 
-                'blok_2' => 135, 
-                'blok_3' => 80,  
-                'blok_4' => 160, 
-                'blok_5' => 60   
+                'blok_1' => 0,
+                'blok_2' => 0,
+                'blok_3' => 0,
+                'blok_4' => 0,
+                'blok_5' => 0
             ];
+
+            $result = $conn->query("
+                SELECT waktu_mulai
+                FROM kunjungan
+            ");
+
+            while ($row = $result->fetch_assoc()) {
+
+                $jam =
+                    (int) substr(
+                        $row['waktu_mulai'],
+                        0,
+                        2
+                    );
+
+                if ($jam >= 5 && $jam < 10) {
+
+                    $row_tren['blok_1']++;
+
+                } elseif ($jam >= 10 && $jam < 15) {
+
+                    $row_tren['blok_2']++;
+
+                } elseif ($jam >= 15 && $jam < 20) {
+
+                    $row_tren['blok_3']++;
+
+                } elseif ($jam >= 20 || $jam < 1) {
+
+                    $row_tren['blok_4']++;
+
+                } else {
+
+                    $row_tren['blok_5']++;
+                }
+            }
 
             $max_value = max($row_tren['blok_1'], $row_tren['blok_2'], $row_tren['blok_3'], $row_tren['blok_4'], $row_tren['blok_5']);
             if ($max_value == 0) $max_value = 1; 
@@ -214,12 +349,46 @@ $jumlah_notif = count($notifikasi);
             </div>
 
             <?php
-            $data_keperluan = [
-                ['label' => 'Kunjungan Dinas', 'persen' => 52.4, 'warna' => '#463834'],
-                ['label' => 'Kunjungan Perpustakaan', 'persen' => 23.5, 'warna' => '#82a3a1'],
-                ['label' => 'Janji Temu', 'persen' => 14.5, 'warna' => '#df8a6b'],
-                ['label' => 'Menghadiri Acara', 'persen' => 9.6, 'warna' => '#d5c3b9'],
+            $data_keperluan = [];
+            $result = $conn->query("
+                SELECT
+                    keperluan,
+                    COUNT(*) AS total
+                FROM kunjungan
+                GROUP BY keperluan
+                ORDER BY total DESC
+            ");
+
+            $total_semua = 0;
+            $temp_data = [];
+
+            while ($row = $result->fetch_assoc()) {
+                $total_semua += $row['total'];
+                $temp_data[] = $row;
+            }
+            $warna_chart = [
+                '#463834',
+                '#82a3a1',
+                '#df8a6b',
+                '#d5c3b9',
+                '#7c6f68',
+                '#bfa89e'
             ];
+            $index = 0;
+            foreach ($temp_data as $row) {
+                $persen =
+                    $total_semua > 0 ? round(($row['total'] / $total_semua) * 100,1): 0;
+                $data_keperluan[] = [
+                    'label' => $row['keperluan'],
+                    'persen' => $persen,
+                    'warna' =>
+                        $warna_chart[
+                            $index %
+                            count($warna_chart)
+                        ]
+                ];
+                $index++;
+            }
             ?>
             <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
                 <h4 class="text-sm font-bold text-gray-800 mb-4 tracking-tight">Tren Keperluan</h4>
