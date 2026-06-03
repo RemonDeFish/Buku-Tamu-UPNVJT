@@ -47,6 +47,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $waktu_selesai
     );
 
+    $cek = $conn->prepare("
+        SELECT id
+        FROM kunjungan
+        WHERE tanggal = ?
+        AND (
+            (? BETWEEN waktu_mulai AND waktu_selesai)
+            OR
+            (? BETWEEN waktu_mulai AND waktu_selesai)
+        )
+    ");
+
+    $cek->bind_param(
+        "sss",
+        $tanggal_kunjungan,
+        $waktu_mulai,
+        $waktu_selesai
+    );
+
+    $cek->execute();
+
+    if ($cek->get_result()->num_rows > 0) {
+
+        $error_message =
+            "Jadwal kunjungan bertabrakan dengan jadwal lain.";
+
+    }
     if ($stmt->execute()) {
 
         $id_kunjungan = $conn->insert_id;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS admins (
 
     password VARCHAR(255) NOT NULL,
 
-    otp_code VARCHAR(10) NULL,
+    otp_code VARCHAR(255) NULL,
     otp_expired DATETIME NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
