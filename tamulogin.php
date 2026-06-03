@@ -6,17 +6,28 @@ session_start();
 
 $error_message = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    
-    if (!empty($email)) {
-        $_SESSION['tamu_email'] = $email;
-        // DIUBAH DI SINI: Dialihkan ke halaman input OTP tamu
-        header("Location: tamuotp.php");
-        exit(); 
-    } else {
-        $error_message = "Kolom Email tidak boleh kosong.";
-    }
+$stmt = $conn->prepare("
+    SELECT id
+    FROM visitors
+    WHERE email = ?
+");
+
+$stmt->bind_param("s",$email);
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+if($result->num_rows > 0){
+
+    $_SESSION['tamu_email'] = $email;
+
+    header("Location: tamuotp.php");
+    exit;
+
+}else{
+
+    $error_message = "Email tidak ditemukan.";
+
 }
 ?>
 <!DOCTYPE html>

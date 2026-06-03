@@ -4,30 +4,18 @@ date_default_timezone_set('Asia/Jakarta');
 
 $id_kunjungan = isset($_GET['id']) ? $_GET['id'] : 'SPK-20260310-002';
 
-$database_kunjungan = [
-    'SPK-20260230-001' => [
-        'nama' => 'Melvin Jovanny Simon',
-        'email' => 'melvin@example.com',
-        'telepon' => '081234567890',
-        'tanggal_waktu' => 'Feb 30, 2026  24:30 - 25:00',
-        'instansi' => 'UPN VETERAN JAWA TIMUR',
-        'keperluan' => 'Kunjungan Perpustakaan',
-        'maksud_tujuan' => 'Melakukan studi banding terkait sistem otomasi perpustakaan digital serta manajemen pengarsipan koleksi buku langka.',
-        'status' => 'Complete',
-        'notes' => ''
-    ],
-    'SPK-20260310-002' => [
-        'nama' => 'Remongus Paleojavanicus',
-        'email' => 'brutuayam911@gmail.com',
-        'telepon' => '08721234123',
-        'tanggal_waktu' => '10 Maret, 2026  12:00 - 12:30',
-        'instansi' => 'UNIVERSITAS BRAWIJAYA',
-        'keperluan' => 'Mahasiswa',
-        'maksud_tujuan' => 'Melakukan studi banding dan koordinasi dengan pihak pengelola perpustakaan pusat terkait sistem manajemen digitalisasi arsip skripsi, serta menjajaki peluang kolaborasi riset literatur antar-universitas.',
-        'status' => 'In Progress',
-        'notes' => 'Permohonan ditolak karena gedung rektorat dan perpustakaan pusat sedang disterilkan untuk persiapan acara Dies Natalis kampus pada tanggal tersebut.'
-    ]
-];
+$id = $_GET['id'];
+
+$stmt = $conn->prepare("
+SELECT *
+FROM visits
+WHERE visit_code = ?
+");
+
+$stmt->bind_param("s",$id);
+$stmt->execute();
+
+$data = $stmt->get_result()->fetch_assoc();
 
 if (array_key_exists($id_kunjungan, $database_kunjungan)) {
     $data = $database_kunjungan[$id_kunjungan];

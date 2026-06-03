@@ -14,12 +14,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // --- LOGIKA BACKEND UNTUK TAMU ---
         // Contoh verifikasi sederhana (Silakan sesuaikan dengan database/session sistem Anda):
-        if ($otp_code == "1234") { 
-            header("Location: statuskunjungan.php");
-            exit();
-        } else {
-            $error_message = "Kode OTP yang Anda masukkan salah.";
+        $email = $_SESSION['tamu_email'];
+
+        $stmt = $conn->prepare("
+            SELECT otp_code
+            FROM otp_verification
+            WHERE email = ?
+            AND expires_at > NOW()
+            ORDER BY id DESC
+            LIMIT 1
+        ");
+
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if($row = $result->fetch_assoc()){
+
+            if($row['otp_code'] === $otp_code){
+                $_SESSION['otp_verified'] = true;
+                header("Location: statuskunjungan.php");
+                exit;
+            }
+
         }
+
+        $error_message = "Kode OTP salah.";
     }
 }
 ?>

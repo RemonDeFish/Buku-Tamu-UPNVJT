@@ -9,16 +9,26 @@ $id_kunjungan = (isset($_GET['id'])) ? (int)$_GET['id'] : 0;
 // Mendeteksi asal halaman untuk menyesuaikan teks judul (Mencegah kebingungan jika diakses dari riwayat)
 $asal_halaman = (isset($_GET['from'])) ? $_GET['from'] : '';
 
-// --- DUMMY DATA LOOKUP ---
-$data_tiket = [
-    "nomor_antrian" => "SPK-20260529-01", 
-    "nama_tamu" => "Hilmi Fahrenheit", 
-    "keperluan" => "Kunjungan Dinas - Koordinasi Program SIPPK",
-    "status" => "In Progress",
-    "tanggal" => "12 • 05 • 2026", 
-    "waktu" => "24:00 - 01:00",
-    "ruangan" => "Ruang Tata Usaha Giri Santika 2"
-];
+$id = (int)$_GET['id'];
+
+$stmt = $conn->prepare("
+SELECT
+    v.visit_code,
+    t.full_name,
+    v.purpose,
+    v.status,
+    v.visit_date,
+    v.visit_time
+FROM visits v
+JOIN visitors t
+ON t.id = v.visitor_id
+WHERE v.id = ?
+");
+
+$stmt->bind_param("i",$id);
+$stmt->execute();
+
+$data_tiket = $stmt->get_result()->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="id">
