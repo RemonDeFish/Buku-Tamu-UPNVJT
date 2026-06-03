@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         <?php endif; ?>
 
-                        <form action="" method="POST" autocomplete="off" class="w-full flex flex-col gap-4">
+                        <form action="statuskunjungan.php" method="POST" autocomplete="off" class="w-full flex flex-col gap-4">
                             
                             <div class="w-full flex flex-col gap-1.5">
                                 <label class="text-xs font-semibold text-gray-400 font-roboto">Email</label>
