@@ -118,14 +118,14 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
                     <div class="flex flex-col">
                         <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nama</span>
                         <div class="bg-[#EAEAEA] inline-block px-8 py-2.5 rounded-none text-sm font-semibold text-gray-800 self-start min-w-[220px]">
-                            <?= $data_tiket['nama_pengunjung']; ?>
+                            <?= $data_tiket['nama_tamu']; ?>
                         </div>
                     </div>
 
                     <div class="flex flex-col">
-                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Lokasi Kunjungan</span>
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Keperluan</span>
                         <div class="bg-[#EAEAEA] inline-block px-8 py-2.5 rounded-none text-sm font-semibold text-gray-800 self-start">
-                            <?= $data_tiket['ruangan']; ?>
+                            <?= $data_tiket['keperluan']; ?>
                         </div>
                     </div>
 
@@ -139,7 +139,7 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
                         <div class="flex flex-col">
                             <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Waktu Berkunjung</span>
                             <div class="bg-[#EAEAEA] px-12 py-2.5 rounded-none text-sm font-semibold text-gray-800 tracking-wide">
-                                <?= $data_tiket['waktu_mulai']; ?>
+                                <?= $data_tiket['waktu']; ?>
                             </div>
                         </div>
                     </div>
@@ -179,21 +179,22 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
 
     </main>
 
-    <footer class="relative w-full min-h-[140px] mt-auto z-10 flex flex-col justify-end overflow-hidden no-print">
+    <footer class="relative w-full min-h-[140px] mt-auto z-10 flex flex-col justify-end overflow-hidden">
         <img class="absolute bottom-0 left-0 w-full h-[115%] object-cover z-0 pointer-events-none transform translate-y-6" src="image/vector-1.svg" alt="Footer Wave" />
+        
         <div class="relative z-10 w-full max-w-[1200px] mx-auto px-6 md:px-8 pb-6 flex flex-col gap-4">
             <div class="flex gap-3 justify-center md:justify-start">
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/linkedin-icon.svg" alt="Linkedin" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/instagram-icon.svg" alt="Instagram" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/youtube-icon.svg" alt="Youtube" /></a>
+                <a href="https://x.com/BillGates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
+                <a href="https://www.linkedin.com/in/williamhgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/linkedin-icon.svg" alt="Linkedin" /></a>
+                <a href="https://www.instagram.com/thisisbillgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/instagram-icon.svg" alt="Instagram" /></a>
+                <a href="https://www.youtube.com/billgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/youtube-icon.svg" alt="Youtube" /></a>
             </div>
             <div class="w-full h-[1px] bg-white opacity-20"></div>
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-normal text-white">
                 <p class="opacity-90">© 2026 SIPPK. All rights reserved.</p>
                 <div class="flex gap-6 md:gap-12">
-                    <a href="#" class="text-gray-200 hover:text-white transition">Privacy Policy</a>
-                    <a href="#" class="text-white hover:underline transition">Terms & Conditions</a>
+                    <a href="https://www.whatsapp.com/legal/privacy-policy?lang=id" class="text-gray-200 hover:text-white transition">Privacy Policy</a>
+                    <a href="https://www.whatsapp.com/legal/terms-of-service" class="text-white hover:underline transition">Terms & Conditions</a>
                 </div>
             </div>
         </div>
