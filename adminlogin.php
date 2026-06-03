@@ -77,16 +77,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $admin['id']
                             );
                             if ($otpStmt->execute()) {
-                                kirimOTP(
-                                    $admin['email'],
-                                    $admin['nama_lengkap'],
-                                    $otp
-                                );
-                                header("Location: adminotp.php");
-                                exit();
-                            } else {
-                                $error_message =
-                                    "Gagal menyimpan OTP.";
+                                if (kirimOTP(
+                                        $admin['email'],
+                                        $admin['nama_lengkap'],
+                                        $otp
+                                    )) {
+                                    header("Location: adminotp.php");
+                                    exit();
+                                } else {
+                                    $error_message =
+                                        "OTP gagal dikirim ke email.";
+                                }
                             }
                         }
                     } else {

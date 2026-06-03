@@ -28,13 +28,59 @@ $result = $stmt->get_result();
 $admin = $result->fetch_assoc();
 
 $debugOtp = $admin['otp_code'] ?? '';
+if (
+    isset($_POST['resend_otp'])
+) {
 
+    $otp = str_pad(
+        random_int(0, 9999),
+        4,
+        '0',
+        STR_PAD_LEFT
+    );
+
+    $expired = date(
+        'Y-m-d H:i:s',
+        strtotime('+5 minutes')
+    );
+
+    $updateOtp = $conn->prepare("
+        UPDATE admins
+        SET
+            otp_code = ?,
+            otp_expired = ?
+        WHERE id = ?
+    ");
+
+    $updateOtp->bind_param(
+        "ssi",
+        $otp,
+        $expired,
+        $_SESSION['admin_id']
+    );
+
+    if ($updateOtp->execute()) {
+
+        require_once 'mail.php';
+
+        kirimOTP(
+            $_SESSION['admin_email'],
+            $_SESSION['admin_name'],
+            $otp
+        );
+
+        $error_message =
+            "OTP baru berhasil dikirim.";
+
+    } else {
+
+        $error_message =
+            "Gagal membuat OTP baru.";
+    }
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     if (isset($_POST['otp']) && is_array($_POST['otp'])) {
-
         $otp_code = implode("", $_POST['otp']);
-
         if (!preg_match('/^\d{4}$/', $otp_code)) {
 
             $error_message = "Kode OTP harus terdiri dari 4 digit angka.";
@@ -170,9 +216,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <p class="text-[12px] text-gray-500 font-normal tracking-wide mt-6 text-center">
-                Tidak mendapatkan code? <a href="#" class="font-semibold text-[#6a5750] hover:underline">Kirim Ulang OTP</a>
+                Tidak mendapatkan code? <form method="POST" class="inline"><button
+            type="submit"
+            name="resend_otp"
+            value="1"
+            class="font-semibold text-[#6a5750] hover:underline">
+            Kirim Ulang OTP
+        </button>
+    </form>
             </p>
-
             <p class="text-[11px] text-gray-300 font-normal tracking-wide mt-12">
                 © 2026 | SIPPK
             </p>
