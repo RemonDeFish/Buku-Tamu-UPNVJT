@@ -1,33 +1,54 @@
 <?php
-// ==========================================
-// --- TIKET.PHP (LOGIKA BACKEND PREPARATION) ---
-// ==========================================
+$id_kunjungan = isset($_GET['id'])? (int) $_GET['id']: 0;
 
-// Mengambil ID dari URL parameter (?id=...)
-$id_kunjungan = (isset($_GET['id'])) ? (int)$_GET['id'] : 0;
+$asal_halaman = $_GET['from'] ?? '';
 
-// Mendeteksi asal halaman untuk menyesuaikan teks judul (Mencegah kebingungan jika diakses dari riwayat)
-$asal_halaman = (isset($_GET['from'])) ? $_GET['from'] : '';
-
-$id = (int)$_GET['id'];
+if ($id_kunjungan <= 0) {
+    die("ID kunjungan tidak valid.");
+}
 
 require_once 'config.php';
 
 $stmt = $conn->prepare("
-SELECT *
-FROM kunjungan
-WHERE id = ?
+    SELECT *
+    FROM kunjungan
+    WHERE id = ?
 ");
 
-$stmt->bind_param("i",$id);
+$stmt->bind_param(
+    "i",
+    $id_kunjungan
+);
+
 $stmt->execute();
 
-$data_tiket = $stmt->get_result()->fetch_assoc();
+$data_tiket =
+    $stmt
+    ->get_result()
+    ->fetch_assoc();
 
-$stmt->bind_param("i",$id);
-$stmt->execute();
+if (!$data_tiket) {
+    die("Data kunjungan tidak ditemukan.");
+}
 
-$data_tiket = $stmt->get_result()->fetch_assoc();
+$nomor_tiket =
+    "KJ-" .
+    str_pad(
+        $data_tiket['id'], 5, '0', STR_PAD_LEFT
+    );
+
+$tanggal_display =
+    date(
+        'd M Y',
+        strtotime(
+            $data_tiket['tanggal']
+        )
+    );
+
+$waktu_display =
+    $data_tiket['waktu_mulai']
+    . ' - '
+    . $data_tiket['waktu_selesai'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -105,7 +126,7 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
             
             <div class="bg-[#6A5750] w-[64px] flex items-center justify-center flex-shrink-0 select-none">
                 <span class="transform -rotate-90 text-white font-medium text-sm tracking-[2px] whitespace-nowrap opacity-85">
-                    #<?= $data_tiket['nomor_antrian']; ?>
+                    #<?= $nomor_tiket; ?>
                 </span>
             </div>
 
@@ -118,7 +139,7 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
                     <div class="flex flex-col">
                         <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nama</span>
                         <div class="bg-[#EAEAEA] inline-block px-8 py-2.5 rounded-none text-sm font-semibold text-gray-800 self-start min-w-[220px]">
-                            <?= $data_tiket['nama_tamu']; ?>
+                            <?= htmlspecialchars($data_tiket['nama_pengunjung']); ?>
                         </div>
                     </div>
 
@@ -128,18 +149,29 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
                             <?= $data_tiket['keperluan']; ?>
                         </div>
                     </div>
-
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tujuan</span>
+                        <div class="bg-[#EAEAEA] inline-block px-8 py-2.5 rounded-none text-sm font-semibold text-gray-800 self-start">
+                            <?= htmlspecialchars($data_tiket['tujuan']); ?>
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Status</span>
+                        <div class="bg-[#EAEAEA] inline-block px-8 py-2.5 rounded-none text-sm font-semibold text-gray-800 self-start">
+                            <?= htmlspecialchars($data_tiket['status']); ?>
+                        </div>
+                    </div>
                     <div class="flex flex-row gap-16 items-center pt-1">
                         <div class="flex flex-col">
                             <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tanggal</span>
                             <div class="bg-[#EAEAEA] px-12 py-2.5 rounded-none text-sm font-semibold text-gray-800 tracking-wide">
-                                <?= $data_tiket['tanggal']; ?>
+                                <?= htmlspecialchars($tanggal_display); ?>
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Waktu Berkunjung</span>
                             <div class="bg-[#EAEAEA] px-12 py-2.5 rounded-none text-sm font-semibold text-gray-800 tracking-wide">
-                                <?= $data_tiket['waktu']; ?>
+                                <?= htmlspecialchars($waktu_display); ?>
                             </div>
                         </div>
                     </div>
