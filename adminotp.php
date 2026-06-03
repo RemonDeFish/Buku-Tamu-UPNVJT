@@ -75,9 +75,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
 
             } else {
-
-                $error_message = "Kode OTP salah atau sudah kedaluwarsa.";
-
+                $_SESSION['otp_attempts']++;
+                $sisa =
+                    5 - $_SESSION['otp_attempts'];
+                if ($_SESSION['otp_attempts'] >= 5) {
+                    session_destroy();
+                    header("Location: adminlogin.php");
+                    exit();
+                }
+                $error_message =
+                    "Kode OTP salah. Sisa percobaan: {$sisa}";
             }
         }
     }
