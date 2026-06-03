@@ -1,33 +1,65 @@
 <?php
 require_once 'config.php';
 
+// JANGAN DIUBAH UBAH -Raymond 3-06-2026
+$jumlah_data_per_halaman = 10;
+
+$halaman_aktif = isset($_GET['page'])
+    ? (int) $_GET['page']
+    : 1;
+
+if ($halaman_aktif < 1) {
+    $halaman_aktif = 1;
+}
+
+$total_data_query = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+");
+
+$total_data = $total_data_query
+    ->fetch_assoc()['total'];
+
+$total_halaman = ceil(
+    $total_data /
+    $jumlah_data_per_halaman
+);
+
+if ($total_halaman < 1) {
+    $total_halaman = 1;
+}
+
+if ($halaman_aktif > $total_halaman) {
+    $halaman_aktif = $total_halaman;
+}
+
+$offset =
+    ($halaman_aktif - 1)
+    *
+    $jumlah_data_per_halaman;
+
 $data_kunjungan = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$stmt = $conn->prepare("
+    SELECT *
+    FROM kunjungan
+    ORDER BY id DESC
+    LIMIT ?
+    OFFSET ?
+");
 
-    $nama = trim($_POST['nama']);
-    $no_telp = trim($_POST['no_telp']);
+$stmt->bind_param(
+    "ii",
+    $jumlah_data_per_halaman,
+    $offset
+);
 
-    $stmt = $conn->prepare("
-        SELECT *
-        FROM kunjungan
-        WHERE nama_pengunjung = ?
-        AND no_telp = ?
-        ORDER BY id DESC
-    ");
-    $stmt->bind_param(
-        "ss",
-        $nama,
-        $no_telp
-    );
+$stmt->execute();
 
-    $stmt->execute();
+$result = $stmt->get_result();
 
-    $result = $stmt->get_result();
-
-    while ($row = $result->fetch_assoc()) {
-        $data_kunjungan[] = $row;
-    }
+while ($row = $result->fetch_assoc()) {
+    $data_kunjungan[] = $row;
 }
 ?>
 <!DOCTYPE html>
