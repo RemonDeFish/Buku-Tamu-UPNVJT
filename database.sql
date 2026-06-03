@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS kunjungan (
     ) DEFAULT 'menunggu',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    notes TEXT NULL
 );
 
 -- ------------------------------------------------------------

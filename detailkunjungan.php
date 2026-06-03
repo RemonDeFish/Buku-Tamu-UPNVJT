@@ -4,8 +4,7 @@ date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
 
-$id_kunjungan =
-    isset($_GET['id'])
+$id_kunjungan = isset($_GET['id'])
     ? (int) $_GET['id']
     : 0;
 
@@ -15,72 +14,97 @@ if ($id_kunjungan <= 0) {
     exit();
 }
 
-$stmt = $conn->prepare("
-SELECT *
-FROM kunjungan
-WHERE id = ?
-");
-
-$stmt->bind_param("i",$id_kunjungan);
-$stmt->execute();
-
-$data = $stmt->get_result()->fetch_assoc();
-if (!$data) {
-
-    die("Data kunjungan tidak ditemukan.");
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = isset($_POST['action']) ? $_POST['action'] : '';
-    $target_id = isset($_POST['id_kunjungan']) ? $_POST['id_kunjungan'] : '';
-    $admin_notes = isset($_POST['notes']) ? $_POST['notes'] : '';
+
+    $action = $_POST['action'] ?? '';
+    $target_id = (int) ($_POST['id_kunjungan'] ?? 0);
+    $admin_notes = trim($_POST['notes'] ?? '');
 
     switch ($action) {
+
         case 'terima':
-            $stmt =
-                $conn->prepare("
-                    UPDATE kunjungan
-                    SET status = 'disetujui'
-                    WHERE id = ?
-                ");
+
+            $stmt = $conn->prepare("
+                UPDATE kunjungan
+                SET status = 'disetujui'
+                WHERE id = ?
+            ");
+
             $stmt->bind_param(
                 "i",
                 $target_id
             );
+
             $stmt->execute();
 
             header(
-                "Location: detailkunjungan.php?id=".$target_id
+                "Location: detailkunjungan.php?id="
+                . $target_id .
+                "&status=success_terima"
             );
-            exit;
+
+            exit();
+
         case 'tolak':
-            $stmt =
-                $conn->prepare("
-                    UPDATE kunjungan
-                    SET status = 'ditolak'
-                    WHERE id = ?
-                ");
+
+            $stmt = $conn->prepare("
+                UPDATE kunjungan
+                SET status = 'ditolak'
+                WHERE id = ?
+            ");
+
             $stmt->bind_param(
                 "i",
                 $target_id
             );
+
             $stmt->execute();
 
             header(
-                "Location: detailkunjungan.php?id=".$target_id
+                "Location: detailkunjungan.php?id="
+                . $target_id .
+                "&status=success_tolak"
             );
-            exit;
+
+            exit();
+
+        case 'selesai':
+
+            $stmt = $conn->prepare("
+                UPDATE kunjungan
+                SET status = 'selesai'
+                WHERE id = ?
+            ");
+
+            $stmt->bind_param(
+                "i",
+                $target_id
+            );
+
+            $stmt->execute();
+
+            header(
+                "Location: detailkunjungan.php?id="
+                . $target_id .
+                "&status=success_selesai"
+            );
+
+            exit();
+
         case 'save':
+
             $stmt = $conn->prepare("
                 UPDATE kunjungan
                 SET notes = ?
                 WHERE id = ?
             ");
+
             $stmt->bind_param(
                 "si",
                 $admin_notes,
                 $target_id
             );
+
             $stmt->execute();
 
             header(
@@ -89,47 +113,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "&status=success_save"
             );
 
-            exit;
+            exit();
+
         case 'delete':
+
             $stmt = $conn->prepare("
                 DELETE FROM kunjungan
                 WHERE id = ?
             ");
+
             $stmt->bind_param(
                 "i",
                 $target_id
             );
+
             $stmt->execute();
+
             header(
                 "Location: kelolakunjungan.php?status=success_delete"
             );
-            exit;
-        case 'selesai':
-            $stmt = $conn->prepare("
-                UPDATE kunjungan
-                SET status = 'selesai'
-                WHERE id = ?
-            ");
-            $stmt->bind_param(
-                "i",
-                $target_id
-            );
-            $stmt->execute();
 
-            header(
-                "Location: detailkunjungan.php?id="
-                . $target_id .
-                "&status=success_selesai"
-            );
-            exit;
-}}
+            exit();
+    }
+}
 
-$notifikasi = [
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Mas Amba mendaftarkan kunjungan.'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Keluhan sistem tiket dari Hilmi Fahrenheit.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Amanda Putri mengajukan kunjungan Dinas.']
-];
-$jumlah_notif = count($notifikasi);
+$stmt = $conn->prepare("
+    SELECT *
+    FROM kunjungan
+    WHERE id = ?
+");
+
+$stmt->bind_param(
+    "i",
+    $id_kunjungan
+);
+
+$stmt->execute();
+
+$data = $stmt
+    ->get_result()
+    ->fetch_assoc();
+
+if (!$data) {
+
+    die("Data kunjungan tidak ditemukan.");
+}
+$status = strtolower(
+    $data['status']
+);
+if ($status == 'menunggu') {
+    $badge =
+        'bg-yellow-100 text-yellow-700';
+} elseif ($status == 'disetujui') {
+    $badge =
+        'bg-green-100 text-green-700';
+} elseif ($status == 'ditolak') {
+    $badge =
+        'bg-red-100 text-red-700';
+} elseif ($status == 'selesai') {
+    $badge =
+        'bg-blue-100 text-blue-700';
+} else {
+    $badge =
+        'bg-gray-100 text-gray-700';
+}
+$notifikasi = [];
+$jumlah_notif = 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -210,7 +259,7 @@ $jumlah_notif = count($notifikasi);
                     <img src="image/avatar-profile.svg" alt="Foto Profil" class="w-full h-full object-cover" />
                 </div>
                 <div class="flex flex-col min-w-0">
-                    <h2 class="text-lg font-bold text-gray-600 truncate"><?= htmlspecialchars($data['nama_pengunjing']) ?></h2>
+                    <h2 class="text-lg font-bold text-gray-600 truncate"><?= htmlspecialchars($data['nama_pengunjung']) ?></h2>
                     <span class="text-xs font-medium text-gray-400 truncate font-roboto mt-0.5"><?= htmlspecialchars($data['no_telp']) ?></span>
                 </div>
             </div>
@@ -275,7 +324,7 @@ $jumlah_notif = count($notifikasi);
             
             <form id="form-admin-notes" method="POST" class="flex flex-col gap-3">
                 <input type="hidden" name="id_kunjungan" value="<?= htmlspecialchars($id_kunjungan) ?>">
-                <textarea name="notes" class="w-full min-h-[70px] text-xs font-medium text-gray-500 font-roboto bg-[#f9fafb] border border-gray-200/80 rounded-xl p-4 focus:outline-none focus:ring-1 focus:ring-[#6a5750] transition resize-none" placeholder="Tambahkan catatan administrasi atau alasan penolakan di sini..."><?= htmlspecialchars($data['notes']) ?></textarea>
+                <textarea name="notes" class="w-full min-h-[70px] text-xs font-medium text-gray-500 font-roboto bg-[#f9fafb] border border-gray-200/80 rounded-xl p-4 focus:outline-none focus:ring-1 focus:ring-[#6a5750] transition resize-none" placeholder="Tambahkan catatan administrasi atau alasan penolakan di sini..."><?= htmlspecialchars($data['notes'] ?? '') ?></textarea>
                 
                 <div class="flex justify-end gap-3 mt-2 text-xs font-bold">
                     <button type="submit" name="action" value="delete" class="bg-red-50 text-red-500 hover:bg-red-100 transition px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm">
