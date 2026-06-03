@@ -3,8 +3,8 @@
 require_once 'mail.php';
 
 $result = kirimOTP(
-    'melvinjs050906@gmail.com',
-    'MelvinJS',
+    'raymondalim2@gmail.com',
+    'Remon',
     '4241'
 );
 

@@ -1,14 +1,14 @@
 <?php
-$host = "localhost";
-$username = "root";
-$password = "MemekAyamMySQL911";
-$database = "sippk_db";
+require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 $conn = new mysqli(
-    $host,
-    $username,
-    $password,
-    $database
+    $_ENV['DB_HOST'],
+    $_ENV['DB_USER'],
+    $_ENV['DB_PASS'],
+    $_ENV['DB_NAME']
 );
 
 if ($conn->connect_error) {
