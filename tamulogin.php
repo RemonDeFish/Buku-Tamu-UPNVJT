@@ -164,23 +164,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         <?php endif; ?>
 
-                        <form action="statuskunjungan.php" method="POST" autocomplete="off" class="w-full flex flex-col gap-4">
+                        <form action="" method="POST" autocomplete="off" class="w-full flex flex-col gap-4">
                             
                             <div class="w-full flex flex-col gap-1.5">
-                                <label class="text-xs font-semibold text-gray-400 font-roboto">Nama</label>
-                                <input
-                                    type="text"
-                                    name="nama"
-                                    placeholder="Nama Lengkap"
-                                    required
-                                >
-
-                                <input
-                                    type="text"
-                                    name="no_telp"
-                                    placeholder="Nomor Telepon"
-                                    required
-                                >
+                                <label class="text-xs font-semibold text-gray-400 font-roboto">Email</label>
+                                <input type="email" name="email" required placeholder="example@gmail.com" 
+                                    class="w-full h-[38px] px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 outline-none focus:border-[#6a5750] focus:ring-1 focus:ring-[#6a5750]/35 transition placeholder-gray-300 shadow-sm bg-white/90" />
                             </div>
 
                             <button type="submit" class="w-full h-[38px] bg-[#6a5750] hover:bg-[#574741] text-white font-medium text-sm rounded-md shadow transition transform active:scale-95 flex items-center justify-center gap-2 mt-1">
@@ -198,6 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <footer class="relative w-full min-h-[140px] mt-auto z-10 flex flex-col justify-end overflow-hidden">
         <img class="absolute bottom-0 left-0 w-full h-[115%] object-cover z-0 pointer-events-none transform translate-y-6" src="image/vector-1.svg" alt="Footer Wave" />
+        
         <div class="relative z-10 w-full max-w-[1200px] mx-auto px-6 md:px-8 pb-6 flex flex-col gap-4">
             <div class="flex gap-3 justify-center md:justify-start">
                 <a href="https://x.com/BillGates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
