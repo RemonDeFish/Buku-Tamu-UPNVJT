@@ -116,14 +116,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200/70">
-                                <?php foreach ($dummy_kunjungan as $row): 
+                                <?php foreach ($data_kunjungan as $row): 
                                     $status = strtolower($row['status']);
-                                    if ($status == 'in progress') {
+                                    if ($status == 'menunggu') {
                                         $badge_style = 'bg-purple-50 text-purple-500';
-                                    } elseif ($status == 'complete') {
+                                    } elseif ($status == 'disetujui') {
                                         $badge_style = 'bg-green-50 text-green-500';
-                                    } elseif ($status == 'pending') {
-                                        $badge_style = 'bg-blue-50 text-blue-500';
+                                    } elseif ($status == 'ditolak') {
+                                        $badge_style = 'bg-red-50 text-red-500';
                                     } elseif ($status == 'canceled') {
                                         $badge_style = 'bg-amber-50 text-amber-500';
                                     } else {
