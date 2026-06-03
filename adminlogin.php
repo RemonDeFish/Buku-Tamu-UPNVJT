@@ -4,75 +4,98 @@ require_once 'config.php';
 
 $error_message = "";
 
+if (!isset($_SESSION['login_attempt'])) {
+    $_SESSION['login_attempt'] = 0;
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
 
-    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
-    if (empty($recaptcha_response)) {
-        $error_message = "Silakan centang verifikasi bahwa Anda bukan robot.";
+    if ($_SESSION['login_attempt'] >= 5) {
+        $error_message =
+            "Terlalu banyak percobaan login. Silakan coba lagi beberapa saat lagi.";
     } else {
-        $stmt = $conn->prepare("
-            SELECT
-                id,
-                nama_lengkap,
-                email,
-                password
-            FROM admins
-            WHERE email = ?
-            LIMIT 1
-        ");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
+        $email = trim($_POST['email']);
+        $password = $_POST['password'];
 
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 1) {
-
-            $admin = $result->fetch_assoc();
-
-            if (password_verify($password, $admin['password'])) {
-
-                session_regenerate_id(true);
-
-                $_SESSION['admin_id'] = $admin['id'];
-                $_SESSION['admin_name'] = $admin['nama_lengkap'];
-                $_SESSION['admin_email'] = $admin['email'];
-
-                $otp = str_pad(rand(0,9999), 4, '0', STR_PAD_LEFT);
-
-                $expired = date(
-                    'Y-m-d H:i:s',
-                    strtotime('+5 minutes')
-                );
-
-                $otpStmt = $conn->prepare("
-                    UPDATE admins
-                    SET
-                        otp_code = ?,
-                        otp_expired = ?
-                    WHERE id = ?
-                ");
-
-                if (!$otpStmt) {
-                    die("Prepare gagal: " . $conn->error);
-                }
-
-                $otpStmt->bind_param(
-                    "ssi",
-                    $otp,
-                    $expired,
-                    $admin['id']
-                );
-
-                $otpStmt->execute();
-                header("Location: adminotp.php");
-                exit();
-            } else {
-                $error_message = "Password salah.";
-            }
+        $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
+        if (empty($recaptcha_response)) {
+            $error_message =
+                "Silakan centang verifikasi bahwa Anda bukan robot.";
         } else {
-            $error_message = "Email tidak ditemukan.";
+            $stmt = $conn->prepare("
+                SELECT
+                    id,
+                    nama_lengkap,
+                    email,
+                    password
+                FROM admins
+                WHERE email = ?
+                LIMIT 1
+            ");
+            if (!$stmt) {
+                $error_message ="Terjadi kesalahan sistem.";
+            } else {
+                $stmt->bind_param("s",$email);
+
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows === 1) {
+                    $admin = $result->fetch_assoc();
+                    if (password_verify($password,$admin['password'])) {
+                        session_regenerate_id(true);
+                        $_SESSION['admin_id'] = $admin['id'];
+                        $_SESSION['admin_name'] = $admin['nama_lengkap'];
+                        $_SESSION['admin_email'] = $admin['email'];
+                        $_SESSION['otp_pending'] = true;
+                        $_SESSION['otp_admin_id'] = $admin['id'];
+                        unset($_SESSION['otp_verified']);
+                        $_SESSION['login_attempt'] = 0;
+                        $otp = str_pad(random_int(0,9999),4,'0',STR_PAD_LEFT);
+                        $expired = date(
+                            'Y-m-d H:i:s',
+                            strtotime(
+                                '+5 minutes'
+                            )
+                        );
+                        $otpStmt =
+                            $conn->prepare("
+                                UPDATE admins
+                                SET
+                                    otp_code = ?,
+                                    otp_expired = ?,
+                                    otp_attempts = 0
+                                WHERE id = ?
+                            ");
+                        if (!$otpStmt) {
+                            $error_message =
+                                "Gagal membuat OTP.";
+                        } else {
+                            $otpStmt->bind_param(
+                                "ssi",
+                                $otp,
+                                $expired,
+                                $admin['id']
+                            );
+                            if ($otpStmt->execute()) {
+                                header(
+                                    "Location: adminotp.php"
+                                );
+                                exit();
+                            } else {
+                                $error_message =
+                                    "Gagal menyimpan OTP.";
+                            }
+                        }
+                    } else {
+                        $_SESSION['login_attempt']++;
+                        $error_message =
+                            "Password salah.";
+                    }
+                } else {
+                    $_SESSION['login_attempt']++;
+                    $error_message =
+                        "Email tidak ditemukan.";
+                }
+            }
         }
     }
 }
@@ -130,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <?php if (!empty($error_message)): ?>
                 <div class="w-full max-w-[516px] bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl p-3 mb-4 text-center font-medium">
-                    <?php echo $error_message; ?>
+                    <?= htmlspecialchars($error_message) ?>
                 </div>
             <?php endif; ?>
 
