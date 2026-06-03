@@ -66,6 +66,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     );
 
     $cek->execute();
+    
+    if (!$stmt) {
+        die($conn->error);
+    }
 
     if ($cek->get_result()->num_rows > 0) {
 

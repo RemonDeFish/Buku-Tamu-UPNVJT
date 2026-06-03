@@ -139,7 +139,7 @@ $data_tiket = $stmt->get_result()->fetch_assoc();
                         <div class="flex flex-col">
                             <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Waktu Berkunjung</span>
                             <div class="bg-[#EAEAEA] px-12 py-2.5 rounded-none text-sm font-semibold text-gray-800 tracking-wide">
-                                <?= $data_tiket['waktu']; ?>
+                                <?= $data_tiket['waktu_mulai']; ?>
                             </div>
                         </div>
                     </div>
