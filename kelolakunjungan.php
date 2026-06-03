@@ -4,7 +4,10 @@
 // =========================================================================
 session_start();
 
+// JANGAN DIUBAH UBAH -Raymond 3-06-2026
 date_default_timezone_set('Asia/Jakarta');
+
+require_once 'config.php';
 
 // --- DATA NOTIFIKASI SIDEBAR ---
 $notifikasi = [
@@ -16,126 +19,139 @@ $notifikasi = [
     ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Randy AK-47 mengajukan Janji Temu Rektorat.'],
     ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Remon Chin mendaftarkan kunjungan Humas.']
 ];
-$jumlah_notif = count($notifikasi);
+$sqlCount = "
+    SELECT COUNT(*) AS total
+    FROM kunjungan
+";
+
+$resultCount = $conn->query($sqlCount);
+
+$total_data =
+    $resultCount
+    ->fetch_assoc()['total'];
 
 // --- LOGIKA FILTER & PAGINATION TABEL ---
 $jumlah_data_per_halaman = 9;
 $halaman_aktif = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
 if ($halaman_aktif < 1) { $halaman_aktif = 1; }
 
-$total_data = 27; 
-$total_halaman = ceil($total_data / $jumlah_data_per_halaman);
+$jumlah_notif = count($notifikasi);
+$where = [];
+$params = [];
+$types = "";
+$sqlWhere = "";
+$sqlCount =
+    "SELECT COUNT(*) AS total
+     FROM kunjungan"
+    . $sqlWhere;
+
+$stmtCount =
+    $conn->prepare($sqlCount);
+
+if (!empty($params)) {
+
+    $stmtCount->bind_param(
+        $types,
+        ...$params
+    );
+}
+
+$stmtCount->execute();
+
+$total_data =
+    $stmtCount
+    ->get_result()
+    ->fetch_assoc()['total'];
+
+$total_halaman =
+    ceil(
+        $total_data /
+        $jumlah_data_per_halaman
+    );
+
+if ($total_halaman < 1) {
+    $total_halaman = 1;
+}
+$offset =
+    ($halaman_aktif - 1)
+    *
+    $jumlah_data_per_halaman;
+
+$sqlData =
+    "SELECT *
+     FROM kunjungan"
+    . $sqlWhere .
+    "
+     ORDER BY id DESC
+     LIMIT ?
+     OFFSET ?
+";
+
+$stmt =
+    $conn->prepare($sqlData);
+
+$paramsData = $params;
+$paramsData[] = $jumlah_data_per_halaman;
+$paramsData[] = $offset;
+
+$typesData =
+    $types . "ii";
+
+$stmt->bind_param(
+    $typesData,
+    ...$paramsData
+);
+
+$stmt->execute();
+
+$result =
+    $stmt->get_result();
+
+$data_kunjungan = [];
+
+while (
+    $row =
+    $result->fetch_assoc()
+) {
+
+    $data_kunjungan[] =
+        $row;
+}
 
 $filter_id_tamu   = isset($_GET['filter_id'])         ? trim($_GET['filter_id'])         : '';
 $filter_tanggal   = isset($_GET['filter_tanggal'])   ? trim($_GET['filter_tanggal'])   : '';
 $filter_keperluan = isset($_GET['filter_keperluan']) ? trim($_GET['filter_keperluan']) : '';
 
-// Data Dummy ID Tamu untuk List Dropdown Searchable
-$opsi_id_tamu = [
-    "#SPK-20260230-001",
-    "#SPK-20260310-002",
-    "#SPK-20251115-003",
-    "#SPK-20261220-004",
-    "#SPK-20260725-005",
-    "#SPK-20260725-006",
-    "#SPK-20260725-007",
-    "#SPK-20260725-008",
-    "#SPK-20260230-009"
-];
+$where = [];
+$params = [];
+$types = "";
 
-// DATA DUMMY TABEL UTAMA
-$dummy_kunjungan = [
-    [
-        "id"             => 1,
-        "nomor_antrian"  => "#SPK-20260230-001",
-        "nama_lengkap"   => "Melvin Jovanny Simon",
-        "tanggal_waktu"  => "Feb 30, 2026  24:30 - 25:00",
-        "keperluan"      => "Kunjungan Perpustakaan",
-        "instansi"       => "UPN VETERAN JAWA TIMUR",
-        "kontak"         => "081234567890",
-        "status"         => "Complete",
-    ],
-    [
-        "id"             => 2,
-        "nomor_antrian"  => "#SPK-20260310-002",
-        "nama_lengkap"   => "Remongus Paleojavanicus",
-        "tanggal_waktu"  => "Mar 10, 2026  12:00 - 12:30",
-        "keperluan"      => "Kunjungan Dinas",
-        "instansi"       => "UNIVERSITAS BRAWIJAYA",
-        "kontak"         => "081234567890",
-        "status"         => "In Progress",
-    ],
-    [
-        "id"             => 3,
-        "nomor_antrian"  => "#SPK-20251115-003",
-        "nama_lengkap"   => "Darrell Caldwell",
-        "tanggal_waktu"  => "Nov 10, 2026  04:00 - 05:30",
-        "keperluan"      => "Janji Temu",
-        "instansi"       => "PT. Minyak Sawit",
-        "kontak"         => "089677778888",
-        "status"         => "Pending",
-    ],
-    [
-        "id"             => 4,
-        "nomor_antrian"  => "#SPK-20261220-004",
-        "nama_lengkap"   => "Aulia Canto De Luna",
-        "tanggal_waktu"  => "Dec 20, 2026  23:30 - 24:30",
-        "keperluan"      => "Kunjungan Perpustakaan",
-        "instansi"       => "PT. Pencari Cinta Sejati",
-        "kontak"         => "081711223344",
-        "status"         => "Approved",
-    ],
-    [
-        "id"             => 5,
-        "nomor_antrian"  => "#SPK-20260725-005",
-        "nama_lengkap"   => "Ranga Malam Madura United",
-        "tanggal_waktu"  => "Jul 25, 2026  12:00 - 13:00",
-        "keperluan"      => "Kunjungan Perpustakaan",
-        "instansi"       => "CEO Gemini Antigravity",
-        "kontak"         => "081711223344",
-        "status"         => "Rejected",
-    ],
-    [
-        "id"             => 6,
-        "nomor_antrian"  => "#SPK-20260725-006",
-        "nama_lengkap"   => "Galang Samudera Hindia",
-        "tanggal_waktu"  => "Jul 25, 2026  12:00 - 13:00",
-        "keperluan"      => "Kunjungan Dinas",
-        "instansi"       => "UPN VETERAN JAWA TIMUR",
-        "kontak"         => "081333666999",
-        "status"         => "Canceled",
-    ],
-    [
-        "id"             => 7,
-        "nomor_antrian"  => "#SPK-20260725-007",
-        "nama_lengkap"   => "Hilmi Fahrenheit",
-        "tanggal_waktu"  => "Jul 25, 2026  12:00 - 13:00",
-        "keperluan"      => "Janji Temu",
-        "instansi"       => "UPN VETERAN JAWA TIMUR",
-        "kontak"         => "081333666999",
-        "status"         => "In Progress",
-    ],
-    [
-        "id"             => 8,
-        "nomor_antrian"  => "#SPK-20260725-008",
-        "nama_lengkap"   => "Daffa Telolet",
-        "tanggal_waktu"  => "Jul 25, 2026  12:00 - 13:00",
-        "keperluan"      => "Kunjungan Dinas",
-        "instansi"       => "UPN VETERAN JAWA TIMUR",
-        "kontak"         => "081333666999",
-        "status"         => "Complete",
-    ],
-    [
-        "id"             => 9,
-        "nomor_antrian"  => "#SPK-20260230-009",
-        "nama_lengkap"   => "El Pagos Prongos",
-        "tanggal_waktu"  => "Feb 30, 2026  24:30 - 25:00",
-        "keperluan"      => "Janji Temu",
-        "instansi"       => "UPN VETERAN JAWA TIMUR",
-        "kontak"         => "081333666999",
-        "status"         => "Complete",
-    ]
-];
+if ($filter_keperluan !== '') {
+
+    $where[] = "keperluan = ?";
+    $params[] = $filter_keperluan;
+    $types .= "s";
+}
+
+if ($filter_tanggal !== '') {
+
+    $where[] = "tanggal = ?";
+    $params[] = $filter_tanggal;
+    $types .= "s";
+}
+if (!empty($where)) {
+
+    $sqlWhere =
+        " WHERE " .
+        implode(" AND ", $where);
+}
+
+if (!empty($where)) {
+
+    $sqlWhere =
+        " WHERE " .
+        implode(" AND ", $where);
+}
 
 function build_page_url($page, $filter_id, $filter_tanggal, $filter_keperluan) {
     $params = ['page' => $page];
@@ -343,7 +359,7 @@ function build_page_url($page, $filter_id, $filter_tanggal, $filter_keperluan) {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100" id="tableBodyData">
-                        <?php foreach ($dummy_kunjungan as $row):
+                        <?php foreach ($data_kunjungan as $row):
                             $status = strtolower($row['status']);
                             if ($status === 'in progress') { $badge_style = 'bg-purple-50 text-purple-500'; } 
                             elseif ($status === 'complete' || $status === 'completed') { $badge_style = 'bg-green-50 text-green-500'; } 
@@ -353,12 +369,17 @@ function build_page_url($page, $filter_id, $filter_tanggal, $filter_keperluan) {
                             else { $badge_style = 'bg-gray-100 text-gray-500'; }
                         ?>
                             <tr class="hover:bg-gray-50/50 transition table-row-item">
-                                <td class="py-5 text-[11px] font-bold text-gray-700 font-roboto break-words pr-2"><?= htmlspecialchars($row['nomor_antrian']) ?></td>
-                                <td class="py-5 text-xs font-semibold text-gray-800 break-words pr-2 search-target-nama"><?= htmlspecialchars($row['nama_lengkap']) ?></td>
-                                <td class="py-5 text-[11px] font-medium text-gray-500 font-roboto break-words pr-2"><?= htmlspecialchars($row['tanggal_waktu']) ?></td>
+                                <td class="py-5 text-[11px] font-bold text-gray-700 font-roboto break-words pr-2">
+                                    #KJ-<?= str_pad($row['id'], 5, '0', STR_PAD_LEFT) ?>
+                                </td>
+                                <td class="py-5 text-xs font-semibold text-gray-800 break-words pr-2 search-target-nama"><?= htmlspecialchars($row['nama_pengunjung']) ?></td>
+                                <td class="py-5 text-[11px] font-medium text-gray-500 font-roboto break-words pr-2"><?= date('d M Y', strtotime($row['tanggal'])) ?>
+                                <?= htmlspecialchars($row['waktu_mulai']) ?>
+                                -
+                                <?= htmlspecialchars($row['waktu_selesai']) ?></td>
                                 <td class="py-5 text-[11px] font-semibold text-gray-600 break-words pr-2"><?= htmlspecialchars($row['keperluan']) ?></td>
                                 <td class="py-5 text-[11px] font-medium text-gray-400 font-roboto break-words pr-2 search-target-instansi"><?= htmlspecialchars($row['instansi']) ?></td>
-                                <td class="py-5 text-[11px] font-medium text-gray-600 font-roboto break-words pr-2 search-target-kontak"><?= htmlspecialchars($row['kontak']) ?></td>
+                                <td class="py-5 text-[11px] font-medium text-gray-600 font-roboto break-words pr-2 search-target-kontak"><?= htmlspecialchars($row['no_telp']) ?></td>
                                 <td class="py-5 text-center">
                                     <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold <?= $badge_style ?>">
                                         <?= htmlspecialchars($row['status']) ?>
