@@ -9,15 +9,15 @@ function kirimOTP($tujuanEmail, $nama, $otp)
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
-        $mail->Host = 'smtp-relay.brevo.com';
+        $mail->Host = $_ENV['SMTP_HOST'];
         $mail->SMTPAuth = true;
-        $mail->Username = 'ad747a001@smtp-brevo.com';
-        $mail->Password = 'xsmtpsib-83aac8adf1c40dbac08543eb2fdfa8c8d14b61ace9a098cfa5b8b4c51d90b611-QJbMZuDIzWF0xD8A';
+        $mail->Username = $_ENV['SMTP_USERNAME'];
+        $mail->Password = $_ENV['SMTP_PASSWORD'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->Port = $_ENV['SMTP_PORT'];
         $mail->setFrom(
-            'sippk.upnjatim@gmail.com',
-            'SIPPK'
+            $_ENV['MAIL_FROM_ADDRESS'],
+            $_ENV['MAIL_FROM_NAME']
         );
         $mail->addAddress(
             $tujuanEmail,
