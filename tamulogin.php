@@ -1,46 +1,78 @@
 <?php
-// ==========================================
-// --- TAMULOGIN.PHP (LOGIKA BACKEND TAMU) ---
-// ==========================================
+
 session_start();
+
+require_once 'config.php';
+require_once 'mail.php';
 
 $error_message = "";
 
-$stmt = $conn->prepare("
-    SELECT id
-    FROM visitors
-    WHERE email = ?
-");
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-$stmt->bind_param("s",$email);
-$stmt->execute();
+    $nama =
+        trim($_POST['nama']);
 
-$result = $stmt->get_result();
+    $no_telp =
+        trim($_POST['no_telp']);
 
-require_once 'config.php';
-
-$stmt = $conn->prepare("
-SELECT *
-FROM kunjungan
-WHERE email = ?
-");
-
-$stmt->bind_param("s",$email);
-$stmt->execute();
-
-$data = $stmt->get_result()->fetch_assoc();
-
-if($data)
-{
-    $_SESSION['tamu_email'] = $email;
-    $_SESSION['otp_tamu'] = rand(1000,9999);
-
-    header("Location: tamuotp.php");
-    exit();
-}
-else
-{
-    $error_message = "Email tidak ditemukan.";
+    $stmt = $conn->prepare("
+        SELECT *
+        FROM kunjungan
+        WHERE nama_pengunjung = ?
+        AND no_telp = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param(
+        "ss",
+        $nama,
+        $no_telp
+    );
+    $stmt->execute();
+    $result =
+        $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $data =
+            $result->fetch_assoc();
+        $otp = str_pad(
+            random_int(0,9999),
+            4,
+            '0',
+            STR_PAD_LEFT
+        );
+        $expired = date(
+            'Y-m-d H:i:s',
+            strtotime('+5 minutes')
+        );
+        $updateOtp =
+            $conn->prepare("
+                UPDATE kunjungan
+                SET
+                    otp_code = ?,
+                    otp_expired = ?
+                WHERE id = ?
+            ");
+        $updateOtp->bind_param(
+            "ssi",
+            $otp,
+            $expired,
+            $data['id']
+        );
+        $updateOtp->execute();
+        $_SESSION['tamu_id'] =
+            $data['id'];
+        $_SESSION['otp_pending_tamu'] =
+            true;
+        kirimOTP(
+            'EMAIL_TUJUAN',
+            $data['nama_pengunjung'],
+            $otp
+        );
+        header("Location: tamuotp.php");
+        exit();
+    } else {
+        $error_message =
+            "Data kunjungan tidak ditemukan.";
+    }
 }
 ?>
 <!DOCTYPE html>
