@@ -2,25 +2,32 @@
 session_start();
 date_default_timezone_set('Asia/Jakarta');
 
-$id_kunjungan = isset($_GET['id']) ? $_GET['id'] : 'SPK-20260310-002';
+require_once 'config.php';
 
-$id = $_GET['id'];
+$id_kunjungan =
+    isset($_GET['id'])
+    ? (int) $_GET['id']
+    : 0;
+
+if ($id_kunjungan <= 0) {
+
+    header("Location: kelolakunjungan.php");
+    exit();
+}
 
 $stmt = $conn->prepare("
 SELECT *
-FROM visits
-WHERE visit_code = ?
+FROM kunjungan
+WHERE id = ?
 ");
 
-$stmt->bind_param("s",$id);
+$stmt->bind_param("i",$id_kunjungan);
 $stmt->execute();
 
 $data = $stmt->get_result()->fetch_assoc();
+if (!$data) {
 
-if (array_key_exists($id_kunjungan, $database_kunjungan)) {
-    $data = $database_kunjungan[$id_kunjungan];
-} else {
-    $data = $database_kunjungan['SPK-20260310-002'];
+    die("Data kunjungan tidak ditemukan.");
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,30 +37,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($action) {
         case 'terima':
-            // TODO: Tambahkan query SQL UPDATE status menjadi 'Accepted' atau 'Complete'
-            // mysqli_query($conn, "UPDATE kunjungan SET status='Accepted' WHERE id='$target_id'");
-            header("Location: kelolakunjungan.php?status=success_terima");
-            exit;
+            $stmt =
+                $conn->prepare("
+                    UPDATE kunjungan
+                    SET status = 'disetujui'
+                    WHERE id = ?
+                ");
+            $stmt->bind_param(
+                "i",
+                $target_id
+            );
+            $stmt->execute();
 
+            header(
+                "Location: detailkunjungan.php?id=".$target_id
+            );
+            exit;
         case 'tolak':
-            // TODO: Tambahkan query SQL UPDATE status menjadi 'Rejected'
-            // mysqli_query($conn, "UPDATE kunjungan SET status='Rejected' WHERE id='$target_id'");
-            header("Location: kelolakunjungan.php?status=success_tolak");
-            exit;
+            $stmt =
+                $conn->prepare("
+                    UPDATE kunjungan
+                    SET status = 'ditolak'
+                    WHERE id = ?
+                ");
+            $stmt->bind_param(
+                "i",
+                $target_id
+            );
+            $stmt->execute();
 
+            header(
+                "Location: detailkunjungan.php?id=".$target_id
+            );
+            exit;
         case 'save':
-            // TODO: Tambahkan query SQL UPDATE untuk menyimpan 'notes' dari admin
-            // mysqli_query($conn, "UPDATE kunjungan SET notes='$admin_notes' WHERE id='$target_id'");
-            header("Location: detailkunjungan.php?id=" . $target_id . "&status=success_save");
-            exit;
+            $stmt = $conn->prepare("
+                UPDATE kunjungan
+                SET notes = ?
+                WHERE id = ?
+            ");
+            $stmt->bind_param(
+                "si",
+                $admin_notes,
+                $target_id
+            );
+            $stmt->execute();
 
-        case 'delete':
-            // TODO: Tambahkan query SQL DELETE data kunjungan
-            // mysqli_query($conn, "DELETE FROM kunjungan WHERE id='$target_id'");
-            header("Location: kelolakunjungan.php?status=success_delete");
+            header(
+                "Location: detailkunjungan.php?id="
+                . $target_id .
+                "&status=success_save"
+            );
+
             exit;
-    }
-}
+        case 'delete':
+            $stmt = $conn->prepare("
+                DELETE FROM kunjungan
+                WHERE id = ?
+            ");
+            $stmt->bind_param(
+                "i",
+                $target_id
+            );
+            $stmt->execute();
+            header(
+                "Location: kelolakunjungan.php?status=success_delete"
+            );
+            exit;
+        case 'selesai':
+            $stmt = $conn->prepare("
+                UPDATE kunjungan
+                SET status = 'selesai'
+                WHERE id = ?
+            ");
+            $stmt->bind_param(
+                "i",
+                $target_id
+            );
+            $stmt->execute();
+
+            header(
+                "Location: detailkunjungan.php?id="
+                . $target_id .
+                "&status=success_selesai"
+            );
+            exit;
+}}
 
 $notifikasi = [
     ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Mas Amba mendaftarkan kunjungan.'],
@@ -141,8 +210,8 @@ $jumlah_notif = count($notifikasi);
                     <img src="image/avatar-profile.svg" alt="Foto Profil" class="w-full h-full object-cover" />
                 </div>
                 <div class="flex flex-col min-w-0">
-                    <h2 class="text-lg font-bold text-gray-600 truncate"><?= htmlspecialchars($data['nama']) ?></h2>
-                    <span class="text-xs font-medium text-gray-400 truncate font-roboto mt-0.5"><?= htmlspecialchars($data['email']) ?></span>
+                    <h2 class="text-lg font-bold text-gray-600 truncate"><?= htmlspecialchars($data['nama_pengunjing']) ?></h2>
+                    <span class="text-xs font-medium text-gray-400 truncate font-roboto mt-0.5"><?= htmlspecialchars($data['no_telp']) ?></span>
                 </div>
             </div>
             
@@ -170,22 +239,20 @@ $jumlah_notif = count($notifikasi);
                     <div class="flex flex-col sm:flex-row sm:items-center py-0.5">
                         <span class="text-gray-400 font-bold uppercase tracking-wider w-full sm:w-[150px] flex-shrink-0">Nama Lengkap</span>
                         <span class="text-gray-500 font-medium hidden sm:inline mr-3">:</span>
-                        <span class="text-gray-600 font-semibold text-sm mt-0.5 sm:mt-0"><?= htmlspecialchars($data['nama']) ?></span>
+                        <span class="text-gray-600 font-semibold text-sm mt-0.5 sm:mt-0"><?= htmlspecialchars($data['nama_pengunjung']) ?></span>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center py-0.5">
                         <span class="text-gray-400 font-bold uppercase tracking-wider w-full sm:w-[150px] flex-shrink-0">Nomor Telepon</span>
                         <span class="text-gray-500 font-medium hidden sm:inline mr-3">:</span>
-                        <span class="text-gray-600 font-semibold mt-0.5 sm:mt-0"><?= htmlspecialchars($data['telepon']) ?></span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center py-0.5">
-                        <span class="text-gray-400 font-bold uppercase tracking-wider w-full sm:w-[150px] flex-shrink-0">Email</span>
-                        <span class="text-gray-500 font-medium hidden sm:inline mr-3">:</span>
-                        <span class="text-blue-600 font-semibold mt-0.5 sm:mt-0 hover:underline cursor-pointer truncate"><?= htmlspecialchars($data['email']) ?></span>
+                        <span class="text-gray-600 font-semibold mt-0.5 sm:mt-0"><?= htmlspecialchars($data['no_telp']) ?></span>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center py-0.5">
                         <span class="text-gray-400 font-bold uppercase tracking-wider w-full sm:w-[150px] flex-shrink-0">Tanggal & Waktu</span>
                         <span class="text-gray-500 font-medium hidden sm:inline mr-3">:</span>
-                        <span class="text-gray-600 font-semibold mt-0.5 sm:mt-0"><?= htmlspecialchars($data['tanggal_waktu']) ?></span>
+                        <span class="text-gray-600 font-semibold mt-0.5 sm:mt-0"><?= date('d M Y', strtotime($data['tanggal'])) ?>
+                        <?= htmlspecialchars($data['waktu_mulai']) ?>
+                        -
+                        <?= htmlspecialchars($data['waktu_selesai']) ?></span>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center py-0.5">
                         <span class="text-gray-400 font-bold uppercase tracking-wider w-full sm:w-[150px] flex-shrink-0">Asal / Instansi</span>
@@ -198,7 +265,7 @@ $jumlah_notif = count($notifikasi);
             <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
                 <h3 class="text-sm font-bold text-gray-500 tracking-tight border-b border-gray-100 pb-2">Maksud dan Tujuan Kunjungan</h3>
                 <p class="text-xs font-medium text-gray-500 font-roboto leading-relaxed text-justify">
-                    <?= htmlspecialchars($data['maksud_tujuan']) ?>
+                    <?= htmlspecialchars($data['keperluan']) ?>
                 </p>
             </div>
         </div>
