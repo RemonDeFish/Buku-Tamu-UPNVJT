@@ -1,18 +1,6 @@
 <?php
 require_once 'config.php';
 
-$jumlah_data_per_halaman = 10;
-
-$halaman_aktif = isset($_GET['page'])
-    ? (int) $_GET['page']
-    : 1;
-
-if ($halaman_aktif < 1) {
-    $halaman_aktif = 1;
-}
-
-$total_halaman = 1;
-
 $data_kunjungan = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -20,20 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama']);
     $no_telp = trim($_POST['no_telp']);
 
-    echo "<pre>";
-    var_dump($_POST);
-    echo "</pre>";
-
     $stmt = $conn->prepare("
         SELECT *
         FROM kunjungan
-        WHERE nama_pengunjung LIKE ?
+        WHERE nama_pengunjung = ?
         AND no_telp = ?
-        ORDER BY created_at DESC
+        ORDER BY id DESC
     ");
-    
-    $nama = "%".$nama."%";
-
     $stmt->bind_param(
         "ss",
         $nama,
@@ -133,61 +114,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200/70">
-                                <?php if (empty($data_kunjungan)): ?>
-                                    <tr>
-                                        <td colspan="5"
-                                            class="py-10 text-center text-gray-400 text-sm">
-                                            Belum ada data kunjungan.
-                                        </td>
-                                    </tr>
+                            <tbody>
+
+                                <?php if (count($data_kunjungan) > 0): ?>
+
+                                    <?php foreach ($data_kunjungan as $row): ?>
+
+                                        <tr>
+                                            <td><?= htmlspecialchars($row['id']) ?></td>
+
+                                            <td><?= htmlspecialchars($row['nama_pengunjung']) ?></td>
+
+                                            <td><?= htmlspecialchars($row['no_telp']) ?></td>
+
+                                            <td><?= htmlspecialchars($row['instansi']) ?></td>
+
+                                            <td><?= htmlspecialchars($row['keperluan']) ?></td>
+
+                                            <td><?= htmlspecialchars($row['tujuan']) ?></td>
+
+                                            <td><?= htmlspecialchars($row['status']) ?></td>
+
+                                        </tr>
+
+                                    <?php endforeach; ?>
+
                                 <?php else: ?>
-                                <?php foreach ($data_kunjungan as $row): 
-                                    $status = strtolower($row['status']);
-                                    if ($status == 'menunggu') {
-                                        $badge_style = 'bg-purple-50 text-purple-500';
-                                    } elseif ($status == 'disetujui') {
-                                        $badge_style = 'bg-green-50 text-green-500';
-                                    } elseif ($status == 'ditolak') {
-                                        $badge_style = 'bg-red-50 text-red-500';
-                                    } elseif ($status == 'selesai') {
-                                        $badge_style = 'bg-blue-50 text-blue-500';
-                                    } else {
-                                        $badge_style = 'bg-gray-100 text-gray-500';
-                                    }
-                                ?>
-                                
-                                    <tr class="hover:bg-slate-50/60 transition">
-                                        <td class="py-6 text-xs font-bold text-gray-700 tracking-tight font-roboto break-words pr-2"><?= $row['nomor_antrian']; ?></td>
-                                        <td class="py-6 text-xs font-semibold text-gray-600 break-words pr-4"><?= htmlspecialchars($row['keperluan']); ?></td>
-                                        <td class="py-6 text-left">
-                                            <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold <?= $badge_style; ?>">
-                                                <?= htmlspecialchars($row['status']); ?>
-                                            </span>
-                                        </td>
-                                        <td class="py-6 text-[11px] font-medium text-gray-500 font-roboto break-words pr-4"><?= htmlspecialchars($row['tanggal_waktu']); ?></td>
-                                        <td class="py-6 text-center">
-                                            <div class="flex items-center justify-center gap-3">
-                                                <a href="tiket.php?id=<?= $row['id']; ?>&from=history" class="inline-block text-[11px] font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200/90 px-2.5 py-1 rounded-full transition shadow-sm">
-                                                    View Tiket
-                                                </a>
-                                                
-                                                <?php if($status != 'selesai' && $status != 'ditolak'): ?>
-                                                    <a href="proses_batal.php?id=<?= (int)$row['id']; ?>" 
-                                                       onclick="return confirm('Apakah Anda yakin ingin membatalkan kunjungan dengan nomor antrian <?= htmlspecialchars($row['nomor_antrian']); ?>?');" 
-                                                       class="text-[11px] font-bold text-red-500 hover:text-red-700 px-1 py-1 transition">
-                                                        Batalkan
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span class="text-[11px] font-medium text-gray-300 px-1 py-1 cursor-not-allowed select-none">
-                                                        -
-                                                    </span>
-                                                <?php endif; ?>
-                                            </div>
+
+                                    <tr>
+                                        <td colspan="7" style="text-align:center;">
+                                            Data tidak ditemukan
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>
+
                                 <?php endif; ?>
+
                             </tbody>
                         </table>
                     </div>
