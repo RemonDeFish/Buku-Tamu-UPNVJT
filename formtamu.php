@@ -203,11 +203,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
 
-                            <div id="container_email" class="input-container w-full bg-[#f1f5f9]/60 hover:bg-[#f1f5f9]/90 focus-within:bg-white border border-slate-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 rounded-xl px-4 py-2 flex flex-col justify-center min-h-[64px] transition group">
-                                <label class="input-label text-[11px] font-semibold text-gray-400 uppercase tracking-wider group-focus-within:text-blue-500 transition-colors">E-mail Tamu</label>
-                                <input type="email" id="email_tamu" name="email_tamu" placeholder="Contoh: 24081111110@student.upnjatim.ac.id" value="<?php echo isset($email_tamu) ? htmlspecialchars($email_tamu) : ''; ?>" required class="w-full bg-transparent text-sm font-medium text-gray-800 outline-none mt-0.5 placeholder-gray-300" />
-                            </div>
-
                             <div id="container_phone" class="input-container w-full bg-[#f1f5f9]/60 hover:bg-[#f1f5f9]/90 focus-within:bg-white border border-slate-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 rounded-xl px-4 py-2 flex flex-col justify-center min-h-[64px] transition group">
                                 <label class="input-label text-[11px] font-semibold text-gray-400 uppercase tracking-wider group-focus-within:text-blue-500 transition-colors">Nomor Telepon</label>
                                 <input type="text" id="phone" name="no_telp" placeholder="08123456789" value="<?php echo isset($no_telp) ? htmlspecialchars($no_telp) : ''; ?>" required class="w-full bg-transparent text-sm font-medium text-gray-800 outline-none mt-0.5 placeholder-gray-300" />
@@ -306,16 +301,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <label class="input-label text-[11px] font-semibold text-gray-400 uppercase tracking-wider group-focus-within:text-blue-500 transition-colors">Maksud dan Tujuan</label>
                                 <textarea id="maksud_tujuan" name="maksud_tujuan" placeholder="Isi tujuan kunjungan anda" required class="w-full h-full bg-transparent text-sm font-medium text-gray-800 outline-none mt-1 resize-none placeholder-gray-300"><?php echo isset($maksud_tujuan) ? htmlspecialchars($maksud_tujuan) : ''; ?></textarea>
                             </div>
-
-                            <div class="flex flex-col items-start mt-2">
-                                <div id="recaptcha_container" class="p-1.5 rounded-lg border border-transparent transition-all duration-200 inline-block flex flex-col items-start bg-transparent">
-                                    <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="recaptchaCallback" data-expired-callback="recaptchaExpiredCallback"></div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
+                    <div class="w-full flex flex-col items-center justify-center mt-6">
+                        <div id="recaptcha_container" class="p-1.5 rounded-lg border border-transparent transition-all duration-200 inline-block bg-transparent">
+                            <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="recaptchaCallback" data-expired-callback="recaptchaExpiredCallback"></div>
+                        </div>
+                    </div>
+                    
                     <div id="globalErrorMessage" class="w-full text-center mt-6 text-sm font-semibold text-red-500 hidden"></div>
 
                     <div class="w-full flex justify-center mt-6">
