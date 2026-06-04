@@ -1,18 +1,19 @@
 <?php
-
 require_once 'config.php';
-
 $success_message = '';
 $error_message = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $nama_lengkap = trim($_POST['nama_lengkap']);
     $email        = trim($_POST['email']);
     $no_telp      = trim($_POST['no_telp']);
     $subjek       = $_POST['subjek'] ?? '';
     $pesan        = trim($_POST['pesan']);
 
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message =
+            "Format email tidak valid.";
+    } else {
     $stmt = $conn->prepare("
         INSERT INTO inbox (
             nama_lengkap,
@@ -25,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ");
 
     if ($stmt) {
-
         $stmt->bind_param(
             "sssss",
             $nama_lengkap,
@@ -36,12 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         );
         if ($stmt->execute()) {
             $success_message = "Pesan berhasil dikirim.";
+            $_POST = [];
         } else {
             $error_message = "Pesan gagal dikirim.";
         }
     } else {
         $error_message = "Terjadi kesalahan sistem.";
     }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -86,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="hidden md:flex items-center gap-11 font-normal text-black text-base">
                     <a href="index.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Home</a>
                     <a href="statuskunjungan.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Status Kunjungan</a>
-                    <a href="contact.php" class="text-[#6a5750] font-semibold border-b-4 rounded-sm border-[#6a5750] pb-1">Contact Us?</a>
+                    <a href="contact.php" class="text-[#6a5750] font-semibold border-b-4 rounded-sm border-[#6a5750] pb-1">Contact Us</a>
                 </div>
                 <a href="adminlogin.php" class="inline-block bg-[#6a5750] hover:bg-[#574741] text-white font-normal text-base px-5 py-2 rounded transition shadow-sm">
                     Masuk Admin
@@ -115,8 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
                                 <img src="image/email-icon.svg" alt="Email" class="w-full h-full object-contain" />
                             </div>
-                            <a href="mailto:SIPPK@gmail.com" class="text-base font-bold text-black hover:text-[#6a5750] transition tracking-wide">
-                                SIPPK@gmail.com
+                            <a href="mailto:sippk.upnjatim@gmail.com" class="text-base font-bold text-black hover:text-[#6a5750] transition tracking-wide">
+                                sippk.upnjatim@gmail.com
                             </a>
                         </div>
 
@@ -124,8 +126,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
                                 <img src="image/whatsapp-icon.svg" alt="WhatsApp" class="w-full h-full object-contain" />
                             </div>
-                            <a href="https://wa.me/6212312345678" target="_blank" class="text-base font-bold text-black hover:text-[#6a5750] transition tracking-wide">
-                                +62 123-1234-5678
+                            <a href="https://wa.me/6285100109663" target="_blank" class="text-base font-bold text-black hover:text-[#6a5750] transition tracking-wide">
+                                +62 851-0010-9663
                             </a>
                         </div>
                     </div>
@@ -136,7 +138,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="lg:col-span-7 bg-white p-8 md:p-12 flex flex-col justify-start pt-12 md:pt-14 relative">
-                    
+                    <?php if (!empty($success_message)): ?>
+                        <div class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+                            <?= htmlspecialchars($success_message) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($error_message)): ?>
+                        <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+                            <?= htmlspecialchars($error_message) ?>
+                        </div>
+                    <?php endif; ?>
                     <form id="contactForm" action="" method="POST" autocomplete="off" class="relative z-10 w-full">
                         
                         <div class="w-full flex flex-col gap-1 mb-6">
