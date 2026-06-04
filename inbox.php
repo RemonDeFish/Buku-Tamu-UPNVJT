@@ -32,21 +32,31 @@ $jumlah_notif = count($notifikasi);
 // --- TAB HANDLING ---
 $tab = isset($_GET['tab']) ? $_GET['tab'] : 'inbox';
 
-// --- DATA DUMMY INBOX (MENGGUNAKAN FORMAT DATETIME DATABASE) ---
-$database_pesan = [
-    ['id' => 1, 'nama' => 'Jullu Jalal', 'subjek' => 'Our Bachelor of Commerce program is ACBSP-accredited.', 'waktu' => '2026-06-03 08:38:00', 'starred' => false, 'bin' => false],
-    ['id' => 2, 'nama' => 'Minerva Barnett', 'subjek' => 'Get Best Advertiser In Your Side Pocket', 'waktu' => '2026-06-03 08:13:00', 'starred' => false, 'bin' => false],
-    ['id' => 3, 'nama' => 'Peter Lewis', 'subjek' => 'Vacation Home Rental Success', 'waktu' => '2026-06-02 19:52:00', 'starred' => false, 'bin' => false],
-    ['id' => 4, 'nama' => 'Anthony Briggs', 'subjek' => 'Free Classifieds Using Them To Promote Your Stuff Online', 'waktu' => '2026-06-02 11:20:00', 'starred' => true, 'bin' => false],
-    ['id' => 5, 'nama' => 'Clifford Morgan', 'subjek' => 'Enhance Your Brand Potential With Giant Advertising Blimps', 'waktu' => '2026-06-01 16:13:00', 'starred' => false, 'bin' => false],
-    ['id' => 6, 'nama' => 'Cecilia Webster', 'subjek' => 'Always Look On The Bright Side Of Life', 'waktu' => '2026-05-30 15:52:00', 'starred' => false, 'bin' => false],
-    ['id' => 7, 'nama' => 'Harvey Manning', 'subjek' => 'Curling Irons Are As Individual As The Women Who Use Them', 'waktu' => '2026-05-29 14:30:00', 'starred' => true, 'bin' => false],
-    ['id' => 8, 'nama' => 'Willie Blake', 'subjek' => 'Our Bachelor of Commerce program is ACBSP-accredited.', 'waktu' => '2026-05-28 08:38:00', 'starred' => false, 'bin' => false],
-    ['id' => 9, 'nama' => 'Minerva Barnett', 'subjek' => 'Get Best Advertiser In Your Side Pocket', 'waktu' => '2026-05-25 08:13:00', 'starred' => false, 'bin' => false],
-    ['id' => 10, 'nama' => 'Fanny Weaver', 'subjek' => 'Free Classifieds Using Them To Promote Your Stuff Online', 'waktu' => '2026-05-24 19:52:00', 'starred' => true, 'bin' => false],
-    ['id' => 11, 'nama' => 'Olga Hogan', 'subjek' => 'Enhance Your Brand Potential With Giant Advertising Blimps', 'waktu' => '2026-05-22 16:13:00', 'starred' => false, 'bin' => false],
-    ['id' => 12, 'nama' => 'Lora Houston', 'subjek' => 'Vacation Home Rental Success', 'waktu' => '2026-05-20 19:52:00', 'starred' => false, 'bin' => false],
-];
+$database_pesan = [];
+
+$query = $conn->query("
+    SELECT
+        id,
+        nama_lengkap,
+        subjek,
+        created_at,
+        status
+    FROM inbox
+    ORDER BY created_at DESC
+");
+
+while ($row = $query->fetch_assoc()) {
+
+    $database_pesan[] = [
+        'id'      => $row['id'],
+        'nama'    => $row['nama_lengkap'],
+        'subjek'  => $row['subjek'],
+        'waktu'   => $row['created_at'],
+        'starred' => false,
+        'bin'     => false,
+        'status'  => $row['status']
+    ];
+}
 
 // --- FUNGSI FORMAT WAKTU AGAR SEPERTI GMAIL ---
 function formatWaktuPesan($datetime_str) {
@@ -72,7 +82,7 @@ function formatWaktuPesan($datetime_str) {
 }
 
 // --- HITUNG JUMLAH TOTAL REAL PER KATEGORI DARI ARRAY DUMMY ---
-$count_inbox = 0;
+$count_inbox = count($database_pesan);
 $count_starred = 0;
 $count_bin = 0;
 

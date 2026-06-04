@@ -1,49 +1,41 @@
 <?php
-// =========================================================================
-// --- DETAILINBOX.PHP (FRONTEND ONLY - AMAN DIOPEN TANPA DATABASE) --------
-// =========================================================================
 session_start();
 date_default_timezone_set('Asia/Jakarta');
 
-// Mengambil ID dari parameter URL, default ke ID 1 jika tidak ada
-$id_pesan = isset($_GET['id']) ? (int)$_GET['id'] : 1;
+require_once 'config.php';
+$id = (int)($_GET['id'] ?? 0);
 
-// --- DATA DUMMY INBOX SEBAGAI SIMULASI DATABASE ---
-$database_pesan = [
-    1 => [
-        'nama' => 'Jullu Jalal',
-        'email' => 'jullujalal@gmail.com',
-        'nohp' => '081234567890',
-        'waktu' => '08:38 AM',
-        'tanggal' => '03 Juni 2026',
-        'subjek' => 'Our Bachelor of Commerce program is ACBSP-accredited.',
-        'pesan' => "Halo Admin SIPPK,\n\nSaya ingin menanyakan terkait rincian program Bachelor of Commerce apakah benar sudah terakreditasi oleh ACBSP secara penuh? Mohon informasi detail mengenai dokumen pendukung atau sertifikat akreditasi tersebut untuk keperluan verifikasi berkas studi banding kami.\n\nTerima kasih atas bantuan dan responnya.\n\nSalam,\nJullu Jalal"
-    ],
-    2 => [
-        'nama' => 'Minerva Barnett',
-        'email' => 'minerva.b@example.com',
-        'nohp' => '085799887766',
-        'waktu' => '08:13 AM',
-        'tanggal' => '03 Juni 2026',
-        'subjek' => 'Get Best Advertiser In Your Side Pocket',
-        'pesan' => "Selamat pagi,\n\nKami menawarkan solusi periklanan digital terbaik untuk meningkatkan visibilitas platform SIPPK di kancah nasional. Layanan kami mencakup optimasi SEO dan manajemen iklan tertarget.\n\nHormat kami,\nMinerva Barnett"
-    ],
-    3 => [
-        'nama' => 'Kuda',
-        'email' => 'kuda.liar@example.com',
-        'nohp' => '089911223344',
-        'waktu' => '10:15 AM',
-        'tanggal' => '03 Juni 2026',
-        'subjek' => 'Kuda',
-        'pesan' => "Halo, ini adalah simulasi pesan jika subjek dan namanya adalah Kuda seperti yang direncanakan pada simulasi database sebelumnya."
-    ]
-];
+$update = $conn->prepare("
+    UPDATE inbox
+    SET status = 'Sudah Dibaca'
+    WHERE id = ?
+");
 
-// Validasi ketersediaan data dummy
-if (array_key_exists($id_pesan, $database_pesan)) {
-    $data = $database_pesan[$id_pesan];
-} else {
-    $data = $database_pesan[1]; // fallback ke data pertama jika id tidak ditemukan
+if (!$update) {
+    die('Query update gagal: ' . $conn->error);
+}
+
+$update->bind_param("i", $id);
+$update->execute();
+
+$stmt = $conn->prepare("
+    SELECT *
+    FROM inbox
+    WHERE id = ?
+");
+
+if (!$stmt) {
+    die('Query select gagal: ' . $conn->error);
+}
+
+$stmt->bind_param("i", $id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$data = $result->fetch_assoc();
+
+if (!$data) {
+    die('Pesan tidak ditemukan');
 }
 
 // --- HANDLING FORM ACTIONS (MOCKUP/SIMULASI FRONTEND) ---
@@ -52,9 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     switch ($action) {
         case 'delete':
+            $hapus = $conn->prepare("
+                DELETE FROM inbox
+                WHERE id = ?
+            ");
+            $hapus->bind_param("i",$id);
+            $hapus->execute();
             header("Location: inbox.php?status=success_delete");
             exit;
-    }
+            }
 }
 
 // --- DATA NOTIFIKASI SIDEBAR ---
@@ -147,23 +145,22 @@ $jumlah_notif = count($notifikasi);
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-5">
                 <div class="flex items-center gap-4 w-full sm:w-auto">
                     <div class="w-12 h-12 rounded-full bg-[#6a5750] flex items-center justify-center text-white text-base font-bold font-montserrat shadow-sm shrink-0 select-none">
-                        <?= strtoupper(substr($data['nama'], 0, 1)) ?>
+                        <?= strtoupper(substr($data['nama_lengkap'], 0, 1)) ?>
                     </div>
                     <div class="flex flex-col min-w-0">
-                        <h2 class="text-base font-bold text-gray-800 truncate leading-tight"><?= htmlspecialchars($data['nama']) ?></h2>
+                        <h2 class="text-base font-bold text-gray-800 truncate leading-tight"><?= htmlspecialchars($data['nama_lengkap']) ?></h2>
                         <span class="text-xs font-medium text-gray-400 font-roboto truncate mt-0.5">&lt;<?= htmlspecialchars($data['email']) ?>&gt;</span>
-                        <span class="text-[11px] font-medium text-gray-400 font-roboto mt-0.5"><?= htmlspecialchars($data['nohp']) ?></span>
+                        <span class="text-[11px] font-medium text-gray-400 font-roboto mt-0.5"><?= htmlspecialchars($data['no_telp']) ?></span>
                     </div>
                 </div>
                 
                 <div class="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-50">
                     <div class="text-right flex flex-col">
-                        <span class="text-xs font-bold text-gray-700 font-roboto"><?= htmlspecialchars($data['waktu']) ?></span>
-                        <span class="text-[10px] font-medium text-gray-400 font-roboto mt-0.5"><?= htmlspecialchars($data['tanggal']) ?></span>
+                        <span class="text-[10px] font-medium text-gray-400 font-roboto mt-0.5"><?= date('d F Y H:i', strtotime($data['created_at'])) ?></span>
                     </div>
                     
                     <form method="POST" action="" class="flex items-center" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pesan ini?');">
-                        <input type="hidden" name="id_pesan" value="<?= $id_pesan ?>">
+                        <input type="hidden" name="id" value="<?= $id ?>">
                         <button type="submit" name="action" value="delete" class="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-xl transition flex items-center justify-center shadow-sm border border-red-100/50" title="Hapus Pesan">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -179,7 +176,17 @@ $jumlah_notif = count($notifikasi);
                     <?= htmlspecialchars($data['subjek']) ?>
                 </h3>
             </div>
-
+            <div class="flex items-center gap-2 mt-2">
+                <?php if ($data['status'] === 'Belum Dibaca'): ?>
+                    <span class="px-2 py-1 text-xs bg-red-100 text-red-600 rounded-lg">
+                        Belum Dibaca
+                    </span>
+                <?php else: ?>
+                    <span class="px-2 py-1 text-xs bg-green-100 text-green-600 rounded-lg">
+                        Sudah Dibaca
+                    </span>
+                <?php endif; ?>
+            </div>
             <div class="bg-[#f9fafb] border border-gray-100 rounded-2xl p-5 md:p-6 min-h-[180px]">
                 <p class="text-xs font-medium text-gray-600 font-roboto leading-relaxed text-justify whitespace-pre-line">
                     <?= htmlspecialchars($data['pesan']) ?>

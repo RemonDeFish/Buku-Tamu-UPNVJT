@@ -1,13 +1,47 @@
 <?php
-// --- LOGIKA BACKEND PHP (SIAP DIKEMBANGKAN) ---
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama_lengkap = $_POST['nama_lengkap'];
-    $email        = $_POST['email'];
-    $no_telp      = $_POST['no_telp'];
-    $subjek       = isset($_POST['subjek']) ? $_POST['subjek'] : '';
-    $pesan        = $_POST['pesan'];
 
-    // --- TEMPAT QUERY DATABASE / EMAIL ENGINE ANDA ---
+require_once 'config.php';
+
+$success_message = '';
+$error_message = '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $nama_lengkap = trim($_POST['nama_lengkap']);
+    $email        = trim($_POST['email']);
+    $no_telp      = trim($_POST['no_telp']);
+    $subjek       = $_POST['subjek'] ?? '';
+    $pesan        = trim($_POST['pesan']);
+
+    $stmt = $conn->prepare("
+        INSERT INTO inbox (
+            nama_lengkap,
+            email,
+            no_telp,
+            subjek,
+            pesan
+        )
+        VALUES (?, ?, ?, ?, ?)
+    ");
+
+    if ($stmt) {
+
+        $stmt->bind_param(
+            "sssss",
+            $nama_lengkap,
+            $email,
+            $no_telp,
+            $subjek,
+            $pesan
+        );
+        if ($stmt->execute()) {
+            $success_message = "Pesan berhasil dikirim.";
+        } else {
+            $error_message = "Pesan gagal dikirim.";
+        }
+    } else {
+        $error_message = "Terjadi kesalahan sistem.";
+    }
 }
 ?>
 <!DOCTYPE html>

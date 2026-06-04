@@ -66,6 +66,34 @@ CREATE TABLE IF NOT EXISTS log_aktivitas (
     REFERENCES admins(id)
     ON DELETE CASCADE
 );
+-- Tabel inbox untuk menyimpan pesan dari pengunjung
+CREATE TABLE inbox (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    nama_lengkap VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    no_telp VARCHAR(20) NOT NULL,
+
+    subjek ENUM(
+        'Pengaduan',
+        'Kunjungan',
+        'Dokumen',
+        'Lain-lain'
+    ) NOT NULL,
+
+    pesan TEXT NOT NULL,
+
+    status ENUM(
+        'Belum Dibaca',
+        'Sudah Dibaca'
+    ) NOT NULL DEFAULT 'Belum Dibaca',
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at),
+    INDEX idx_email (email)
+);
 
 -- ------------------------------------------------------------
 -- Data Awal: Admin Default
