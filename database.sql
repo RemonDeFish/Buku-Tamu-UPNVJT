@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS kunjungan (
     tanggal DATE NOT NULL,
     waktu_mulai TIME NOT NULL,
     waktu_selesai TIME NOT NULL,
+    email VARCHAR(255) NOT NULL,
     status ENUM(
         'menunggu',
         'disetujui',
