@@ -43,7 +43,7 @@ $data_kunjungan = [];
 $stmt = $conn->prepare("
     SELECT *
     FROM kunjungan
-    ORDER BY id DESC
+    ORDER BY id ASC
     LIMIT ?
     OFFSET ?
 ");
@@ -167,12 +167,12 @@ while ($row = $result->fetch_assoc()) {
 
                                             <td><?= htmlspecialchars($row['tujuan']) ?></td>
 
-                                            <td>
-                                            <?php if ($row['status'] === 'Disetujui'): ?>
+                                            <?php $status = strtolower(trim($row['status']));?>
+                                            <td><?php if ($status === 'disetujui'): ?>
                                                 <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700">
                                                     Disetujui
                                                 </span>
-                                            <?php elseif ($row['status'] === 'Ditolak'): ?>
+                                            <?php elseif ($status === 'ditolak'): ?>
                                                 <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700">
                                                     Ditolak
                                                 </span>
