@@ -110,7 +110,7 @@ while ($row = $result->fetch_assoc()) {
                 <div class="hidden md:flex items-center gap-11 font-normal text-black text-base">
                     <a href="index.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Home</a>
                     <a href="statuskunjungan.php" class="text-[#6a5750] font-semibold border-b-4 rounded-sm border-[#6a5750] pb-1">Status Kunjungan</a>
-                    <a href="contact.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Contact Us?</a>
+                    <a href="contact.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Contact Us</a>
                 </div>
                 <a href="adminlogin.php" class="inline-block bg-[#6a5750] hover:bg-[#574741] text-white font-normal text-base px-5 py-2 rounded transition shadow-sm">
                     Masuk Admin
@@ -139,12 +139,13 @@ while ($row = $result->fetch_assoc()) {
                         <table class="w-full text-left border-collapse min-w-[900px] table-fixed">
                             <thead>
                                 <tr class="border-b-2 border-gray-200/80">
-                                    <th class="w-[12%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Nomor Antrian</th>
-                                    <th class="w-[23%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Nama Pengunjung</th>
-                                    <th class="w-[12%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-left">Status</th>
-                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-left">Tanggal</th>
-                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Waktu</th>
-                                    <th class="w-[23%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-center">Keperluan</th>
+                                    <th class="w-[8%] pb-5 text-[11px] font-bold text-gray-400 uppercase">ID</th>
+                                    <th class="w-[20%] pb-5 text-[11px] font-bold text-gray-400 uppercase">Nama Pengunjung</th>
+                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase">No. Telepon</th>
+                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase">Instansi</th>
+                                    <th class="w-[18%] pb-5 text-[11px] font-bold text-gray-400 uppercase">Keperluan</th>
+                                    <th class="w-[14%] pb-5 text-[11px] font-bold text-gray-400 uppercase">Tujuan</th>
+                                    <th class="w-[10%] pb-5 text-[11px] font-bold text-gray-400 uppercase">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -166,14 +167,24 @@ while ($row = $result->fetch_assoc()) {
 
                                             <td><?= htmlspecialchars($row['tujuan']) ?></td>
 
-                                            <td><?= htmlspecialchars($row['status']) ?></td>
-
+                                            <td>
+                                            <?php if ($row['status'] === 'Disetujui'): ?>
+                                                <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                                                    Disetujui
+                                                </span>
+                                            <?php elseif ($row['status'] === 'Ditolak'): ?>
+                                                <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700">
+                                                    Ditolak
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
+                                                    Menunggu
+                                                </span>
+                                            <?php endif; ?>
+                                            </td>
                                         </tr>
-
                                     <?php endforeach; ?>
-
                                 <?php else: ?>
-
                                     <tr>
                                         <td colspan="7" style="text-align:center;">
                                             Data tidak ditemukan
@@ -224,17 +235,17 @@ while ($row = $result->fetch_assoc()) {
         <img class="absolute bottom-0 left-0 w-full h-[115%] object-cover z-0 pointer-events-none transform translate-y-6" src="image/vector-1.svg" alt="Footer Wave" />
         <div class="relative z-10 w-full max-w-[1200px] mx-auto px-6 md:px-8 pb-6 flex flex-col gap-4">
             <div class="flex gap-3 justify-center md:justify-start">
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/linkedin-icon.svg" alt="Linkedin" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/instagram-icon.svg" alt="Instagram" /></a>
-                <a href="#" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/youtube-icon.svg" alt="Youtube" /></a>
+                <a href="https://x.com/BillGates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/twitter-icon.svg" alt="Twitter" /></a>
+                <a href="https://www.linkedin.com/in/williamhgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/linkedin-icon.svg" alt="Linkedin" /></a>
+                <a href="https://www.instagram.com/thisisbillgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/instagram-icon.svg" alt="Instagram" /></a>
+                <a href="https://www.youtube.com/billgates" class="hover:opacity-80 transition"><img class="w-[24px] h-[24px]" src="image/youtube-icon.svg" alt="Youtube" /></a>
             </div>
             <div class="w-full h-[1px] bg-white opacity-20"></div>
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-normal text-white">
                 <p class="opacity-90">© 2026 SIPPK. All rights reserved.</p>
                 <div class="flex gap-6 md:gap-12">
-                    <a href="#" class="text-gray-200 hover:text-white transition">Privacy Policy</a>
-                    <a href="#" class="text-white hover:underline transition">Terms & Conditions</a>
+                    <a href="https://www.whatsapp.com/legal/privacy-policy?lang=id" class="text-gray-200 hover:text-white transition">Privacy Policy</a>
+                    <a href="https://www.whatsapp.com/legal/terms-of-service" class="text-white hover:underline transition">Terms & Conditions</a>
                 </div>
             </div>
         </div>

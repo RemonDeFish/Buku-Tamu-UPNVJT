@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS log_aktivitas (
     ON DELETE CASCADE
 );
 -- Tabel inbox untuk menyimpan pesan dari pengunjung
-CREATE TABLE inbox (
+CREATE TABLE IF NOT EXISTS inbox (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
     nama_lengkap VARCHAR(100) NOT NULL,
