@@ -17,20 +17,35 @@ if (
     exit();
 }
 
-// --- DATA NOTIFIKASI SIDEBAR ---
-$notifikasi = [
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Mas Amba mendaftarkan kunjungan.'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Keluhan sistem tiket dari Hilmi Fahrenheit.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Amanda Putri mengajukan kunjungan Dinas.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Christine Michelle mengirimkan bukti dokume..'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Tanya Jadwal - Tono Siregar (Universitas Airlan..'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'Randy AK-47 mengajukan Janji Temu Rektorat.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Remon Chin mendaftarkan kunjungan Humas.']
-];
-$jumlah_notif = count($notifikasi);
+$notifikasi = [];
 
-// --- TAB HANDLING ---
-$tab = isset($_GET['tab']) ? $_GET['tab'] : 'inbox';
+$stmtNotif = $conn->prepare("
+    SELECT
+        nama_lengkap,
+        subjek
+    FROM inbox
+    WHERE status = 'Belum Dibaca'
+    ORDER BY created_at DESC
+    LIMIT 5
+");
+
+$stmtNotif->execute();
+
+$resultNotif = $stmtNotif->get_result();
+
+while ($rowNotif = $resultNotif->fetch_assoc()) {
+
+    $notifikasi[] = [
+        'tipe' => 'pesan',
+        'judul' => 'Pesan Baru',
+        'deskripsi' =>
+            $rowNotif['nama_lengkap'] .
+            ' - ' .
+            $rowNotif['subjek']
+    ];
+}
+
+$jumlah_notif = count($notifikasi);
 
 $database_pesan = [];
 
@@ -58,6 +73,14 @@ while ($row = $query->fetch_assoc()) {
     ];
 }
 
+$jumlah_belum_dibaca = 0;
+
+foreach ($database_pesan as $pesan) {
+    if ($pesan['status'] === 'Belum Dibaca') {
+        $jumlah_belum_dibaca++;
+    }
+}
+
 // --- FUNGSI FORMAT WAKTU AGAR SEPERTI GMAIL ---
 function formatWaktuPesan($datetime_str) {
     $timestamp = strtotime($datetime_str);
@@ -83,26 +106,15 @@ function formatWaktuPesan($datetime_str) {
 
 // --- HITUNG JUMLAH TOTAL REAL PER KATEGORI DARI ARRAY DUMMY ---
 $count_inbox = count($database_pesan);
-$count_starred = 0;
-$count_bin = 0;
 
 foreach ($database_pesan as $p) {
-    if (!$p['bin']) $count_inbox++;
-    if ($p['starred'] && !$p['bin']) $count_starred++;
-    if ($p['bin']) $count_bin++;
+    if (!$p['bin']) {
+        $count_inbox++;
+    }
 }
 
 // --- LOGIKA FILTER BERDASARKAN TAB ---
-$pesan_terfilter = [];
-foreach ($database_pesan as $p) {
-    if ($tab === 'starred' && $p['starred'] && !$p['bin']) {
-        $pesan_terfilter[] = $p;
-    } elseif ($tab === 'bin' && $p['bin']) {
-        $pesan_terfilter[] = $p;
-    } elseif ($tab === 'inbox' && !$p['bin']) {
-        $pesan_terfilter[] = $p;
-    }
-}
+$pesan_terfilter = $database_pesan;
 
 // --- LOGIKA PAGINATION REAL (DI-SET 10 DATA PER HALAMAN) ---
 $limit = 10; 
@@ -201,17 +213,26 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
             
             <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
                 <div class="flex gap-8 text-xs font-semibold text-gray-400">
-                    <a href="?tab=inbox" class="flex items-center gap-2 pb-2 transition <?= $tab === 'inbox' ? 'text-[#6a5750] border-b-2 border-[#6a5750]' : 'hover:text-gray-600' ?>">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
-                        Inbox <span class="text-[10px] font-normal text-gray-400"><?= $count_inbox ?></span>
-                    </a>
-                    <a href="?tab=starred" class="flex items-center gap-2 pb-2 transition <?= $tab === 'starred' ? 'text-[#6a5750] border-b-2 border-[#6a5750]' : 'hover:text-gray-600' ?>">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.173-.439.81-.439.98 0l2.115 5.433 5.764.536c.473.044.66.626.308.955l-4.385 4.1 1.218 5.719c.101.474-.414.848-.829.596l-4.997-2.678-4.997 2.678c-.415.252-.93-.122-.83-.596l1.218-5.719-4.385-4.1c-.352-.329-.165-.911.308-.955l5.764-.536 2.114-5.433Z" /></svg>
-                        Starred <span class="text-[10px] font-normal text-gray-400"><?= $count_starred ?></span>
-                    </a>
-                    <a href="?tab=bin" class="flex items-center gap-2 pb-2 transition <?= $tab === 'bin' ? 'text-[#6a5750] border-b-2 border-[#6a5750]' : 'hover:text-gray-600' ?>">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-                        Bin <span class="text-[10px] font-normal text-gray-400"><?= $count_bin ?></span>
+                    <a href="inbox.php" class="flex items-center gap-2 pb-2 text-[#6a5750] border-b-2 border-[#6a5750]">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            class="w-4 h-4">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                        </svg>
+                        Inbox
+                        <span class="text-[10px] font-normal text-gray-400">
+                            <?= $count_inbox ?>
+                        </span>
+                        <?php if ($jumlah_belum_dibaca > 0): ?>
+                            <span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                                <?= $jumlah_belum_dibaca ?>
+                            </span>
+                        <?php endif; ?>
                     </a>
                 </div>
                 
@@ -233,23 +254,31 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
                                     <td class="w-[4%] py-1.5 pl-2 text-center">
                                         <input type="checkbox" class="w-4 h-4 accent-black rounded border-gray-300 focus:ring-0 checkbox-item" />
                                     </td>
-                                    <td class="w-[4%] py-1.5 text-center">
-                                        <button class="focus:outline-none flex items-center justify-center w-full btn-star-toggle">
-                                            <?php if ($row['starred']): ?>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500 star-icon" data-status="filled"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
-                                            <?php else: ?>
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-300 hover:text-gray-400 star-icon" data-status="empty"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.173-.439.81-.439.98 0l2.115 5.433 5.764.536c.473.044.66.626.308.955l-4.385 4.1 1.218 5.719c.101.474-.414.848-.829.596l-4.997-2.678-4.997 2.678c-.415.252-.93-.122-.83-.596l1.218-5.719-4.385-4.1c-.352-.329-.165-.911.308-.955l5.764-.536 2.114-5.433Z" /></svg>
-                                            <?php endif; ?>
-                                        </button>
-                                    </td>
                                     <td class="w-[20%] py-1.5 text-xs font-bold text-gray-800 truncate px-2 search-target-nama">
                                         <?= htmlspecialchars($row['nama']) ?>
+                                        <?php if ($row['status'] === 'Belum Dibaca'): ?>
+                                            <span class="ml-2 px-2 py-0.5 text-[10px] bg-red-100 text-red-600 rounded">
+                                                Baru
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
-                                    <td class="w-[60%] py-1.5 text-xs font-semibold text-gray-800 truncate px-2 search-target-subjek">
+                                    <td class="w-[60%] py-1.5 text-xs truncate px-2 search-target-subjek
+                                        <?= $row['status'] === 'Belum Dibaca'
+                                            ? 'font-bold text-black'
+                                            : 'font-medium text-gray-600'
+                                        ?>">
                                         <?= htmlspecialchars($row['subjek']) ?>
                                     </td>
-                                    <td class="w-[12%] py-1.5 text-right pr-4 text-[11px] font-medium text-gray-400 font-roboto" title="<?= htmlspecialchars($row['waktu']) ?>">
+                                    <td class="w-[10%] py-1.5 text-right pr-4 text-[11px] font-medium text-gray-400 font-roboto">
                                         <?= formatWaktuPesan($row['waktu']) ?>
+                                    </td>
+
+                                    <td class="w-[6%] py-1.5 text-center">
+                                        <a
+                                            href="detailinbox.php?id=<?= $row['id'] ?>"
+                                            class="text-[#6a5750] hover:underline text-xs font-semibold">
+                                            Detail
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -264,17 +293,17 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
 
             <div id="paginationContainer" class="w-full flex justify-center items-center gap-2 mt-10 pt-5 border-t border-gray-200/80">
                 <?php if ($current_page > 1): ?>
-                    <a href="?tab=<?= $tab ?>&page=<?= $current_page - 1 ?>" class="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition">
+                    <a href="?page=<?= $current_page - 1 ?>" class="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.75-7.5" /></svg>
                     </a>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="?tab=<?= $tab ?>&page=<?= $i ?>" class="w-7 h-7 text-xs <?= $current_page === $i ? 'bg-[#6a5750] text-white font-bold shadow-sm' : 'text-gray-600 font-semibold border border-gray-200 hover:bg-gray-50' ?> rounded-lg flex items-center justify-center transition"><?= $i ?></a>
+                    <a href="?page=<?= $i ?>" class="w-7 h-7 text-xs <?= $current_page === $i ? 'bg-[#6a5750] text-white font-bold shadow-sm' : 'text-gray-600 font-semibold border border-gray-200 hover:bg-gray-50' ?> rounded-lg flex items-center justify-center transition"><?= $i ?></a>
                 <?php endfor; ?>
                 
                 <?php if ($current_page < $total_pages): ?>
-                    <a href="?tab=<?= $tab ?>&page=<?= $current_page + 1 ?>" class="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition">
+                    <a href="?page=<?= $current_page + 1 ?>" class="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
                     </a>
                 <?php endif; ?>
@@ -324,7 +353,7 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
                         <div class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
                             <img src="image/tanda-seru.svg" alt="Alert" class="w-4 h-4 object-contain" />
                         </div>
-                    <?php immortality: ?>
+                    <?php else: ?>   
                         <div class="w-9 h-9 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
                             <img src="image/pesan.svg" alt="Message" class="w-4 h-4 object-contain" />
                         </div>
@@ -384,22 +413,6 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
                 paginationContainer.classList.remove('hidden');
                 if(noDataRow) noDataRow.classList.add('hidden');
             }
-        });
-
-        const starButtons = document.querySelectorAll('.btn-star-toggle');
-        starButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                const starSvg = this.querySelector('.star-icon');
-                const isFilled = starSvg.getAttribute('data-status') === 'filled';
-
-                if (isFilled) {
-                    this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-300 hover:text-gray-400 star-icon" data-status="empty"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.173-.439.81-.439.98 0l2.115 5.433 5.764.536c.473.044.66.626.308.955l-4.385 4.1 1.218 5.719c.101.474-.414.848-.829.596l-4.997-2.678-4.997 2.678c-.415.252-.93-.122-.83-.596l1.218-5.719-4.385-4.1c-.352-.329-.165-.911.308-.955l5.764-.536 2.114-5.433Z" /></svg>`;
-                } else {
-                    this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500 star-icon" data-status="filled"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`;
-                }
-            });
         });
 
         const checkboxes = document.querySelectorAll('.checkbox-item');
