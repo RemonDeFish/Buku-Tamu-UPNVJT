@@ -3,6 +3,17 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
+
+// Admin harus login br bisa masuk sini.
+if (
+    !isset($_SESSION['admin_id']) ||
+    !isset($_SESSION['otp_verified']) ||
+    $_SESSION['otp_verified'] !== true
+) {
+    header("Location: adminlogin.php");
+    exit();
+}
+
 //paten
 $id_kunjungan = isset($_GET['id'])
     ? (int) $_GET['id']

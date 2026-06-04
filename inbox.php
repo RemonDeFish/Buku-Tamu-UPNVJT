@@ -6,6 +6,17 @@ session_start();
 
 date_default_timezone_set('Asia/Jakarta');
 
+require_once 'config.php';
+// admin harus login baru bisa akses
+if (
+    !isset($_SESSION['admin_id']) ||
+    !isset($_SESSION['otp_verified']) ||
+    $_SESSION['otp_verified'] !== true
+) {
+    header("Location: adminlogin.php");
+    exit();
+}
+
 // --- DATA NOTIFIKASI SIDEBAR ---
 $notifikasi = [
     ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Mas Amba mendaftarkan kunjungan.'],

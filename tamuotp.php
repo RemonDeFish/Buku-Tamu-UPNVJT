@@ -3,6 +3,7 @@
 // --- TAMUOTP.PHP (LOGIKA BACKEND OTP TAMU) ---
 // ==========================================
 session_start();
+require_once 'config.php';
 
 $error_message = "";
 
