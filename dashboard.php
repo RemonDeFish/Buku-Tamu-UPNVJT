@@ -206,7 +206,7 @@ $jumlah_notif = count($notifikasi);
                     <img src="image/lonceng.svg" alt="Notifikasi" class="w-5 h-5 object-contain" />
                 </button>
                 
-                <a href="logout.php" class="bg-[#6a5750] hover:bg-[#574741] text-white text-xs font-semibold px-4 py-2 rounded transition shadow-sm">
+                <a href="index.php" class="bg-[#6a5750] hover:bg-[#574741] text-white text-xs font-semibold px-4 py-2 rounded transition shadow-sm">
                     Logout
                 </a>
             </div>
