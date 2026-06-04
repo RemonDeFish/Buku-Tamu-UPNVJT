@@ -139,11 +139,12 @@ while ($row = $result->fetch_assoc()) {
                         <table class="w-full text-left border-collapse min-w-[900px] table-fixed">
                             <thead>
                                 <tr class="border-b-2 border-gray-200/80">
-                                    <th class="w-[20%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Nomor Antrian</th>
-                                    <th class="w-[25%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Informasi Keperluan</th>
-                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-left">Status</th>
-                                    <th class="w-[25%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Tanggal dan Waktu Pendaftaran</th>
-                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-center">Aksi</th>
+                                    <th class="w-[12%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Nomor Antrian</th>
+                                    <th class="w-[23%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Nama Pengunjung</th>
+                                    <th class="w-[12%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-left">Status</th>
+                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-left">Tanggal</th>
+                                    <th class="w-[15%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto">Waktu</th>
+                                    <th class="w-[23%] pb-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider font-roboto text-center">Keperluan</th>
                                 </tr>
                             </thead>
                             <tbody>
