@@ -50,8 +50,8 @@ $tanggal_display = $hari[date('w')] . ", " . date('j') . " " . $bulan[date('n')]
             <div class="flex items-center gap-6 md:gap-11">
                 <div class="hidden md:flex items-center gap-11 font-normal text-black text-base">
                     <a href="index.php" class="font-semibold text-[#6a5750] border-b-4 rounded-sm border-[#6a5750] pb-1">Home</a>
-                    <a href="statuskunjungan.php" class="hover:text-[#6a5750] transition">Status Kunjungan</a>
-                    <a href="contact.php" class="hover:text-[#6a5750] transition">Contact Us?</a>
+                    <a href="statuskunjungan.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Status Kunjungan</a>
+                    <a href="contact.php" class="hover:text-[#6a5750] hover:font-semibold hover:border-b-4 hover:border-[#6a5750] hover:rounded-sm transition">Contact Us?</a>
                 </div>
                 <a href="adminlogin.php" class="inline-block bg-[#6a5750] hover:bg-[#574741] text-white font-normal text-base px-5 py-2 rounded transition shadow-sm">
                     Masuk Admin
@@ -95,7 +95,7 @@ $tanggal_display = $hari[date('w')] . ", " . date('j') . " " . $bulan[date('n')]
             </div>
 
             <div class="md:col-span-5 flex justify-center items-center p-0 relative min-h-[220px] md:min-h-full">
-                <img class="absolute w-full h-[175%] object-contain drop-shadow-2xl transform scale-125 -translate-x-6 translate-y-3 z-30 origin-center" src="image/logoduduk.svg" alt="Ilustrasi SIPPK" />
+                <img class="absolute w-full h-[175%] object-contain drop-shadow-2xl transform scale-125 -translate-x-6 translate-y-3 z-30 origin-center" src="image/logobaru.svg" alt="Ilustrasi SIPPK" />
             </div>
 
         </div>
