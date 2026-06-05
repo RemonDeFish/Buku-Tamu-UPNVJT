@@ -127,22 +127,60 @@ while ($row = $result->fetch_assoc()) {
 
 $notifikasi = [];
 
-$result = $conn->query("
-    SELECT *
+/*
+|--------------------------------------------------------------------------
+| NOTIFIKASI KUNJUNGAN
+|--------------------------------------------------------------------------
+*/
+
+$qKunjungan = $conn->query("
+    SELECT
+        id,
+        nama_pengunjung,
+        keperluan
     FROM kunjungan
     WHERE status = 'menunggu'
     ORDER BY id DESC
-    LIMIT 10
+    LIMIT 5
 ");
 
-while ($row = $result->fetch_assoc()) {
+while ($row = $qKunjungan->fetch_assoc()) {
 
     $notifikasi[] = [
         'tipe' => 'kunjungan',
-        'judul' => 'Kunjungan Baru Terdeteksi',
+        'judul' => 'Kunjungan Baru',
         'deskripsi' =>
-            $row['nama_pengunjung']
-            . ' mengajukan kunjungan.'
+            $row['nama_pengunjung'] .
+            ' mengajukan ' .
+            $row['keperluan']
+    ];
+}
+
+/*
+alwiubefwnslfhsiu hdsblkgabslhbgfasb dghba slkuglksdb ljhg balsbd
+ NOTIFIKASI PESAN
+skudahg iusdhpuiga sdlku ibdslgal sb uadshdgkuhbdsal k hlaiurhguas
+*/
+
+$qInbox = $conn->query("
+    SELECT
+        nama_lengkap,
+        subjek
+    FROM inbox
+    WHERE status = 'Belum Dibaca'
+    ORDER BY id DESC
+    LIMIT 5
+");
+
+while ($row = $qInbox->fetch_assoc()) {
+
+    $notifikasi[] = [
+        'tipe' => 'pesan',
+        'judul' => 'Pesan Baru',
+        'deskripsi' =>
+            $row['nama_lengkap'] .
+            ' - ' .
+            $row['subjek']
     ];
 }
 

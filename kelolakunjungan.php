@@ -10,15 +10,66 @@ date_default_timezone_set('Asia/Jakarta');
 require_once 'config.php';
 
 // --- DATA NOTIFIKASI SIDEBAR ---
-$notifikasi = [
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Mas Amba mendaftarkan kunjungan.'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Keluhan sistem tiket dari Hilmi Fahrenheit.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Amanda Putri mengajukan kunjungan Dinas.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Christine Michelle mengirimkan bukti dokume..'],
-    ['tipe' => 'pesan', 'judul' => 'Pesan Baru', 'deskripsi' => 'Tanya Jadwal - Tono Siregar (Universitas Airlan..'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Randy AK-47 mengajukan Janji Temu Rektorat.'],
-    ['tipe' => 'kunjungan', 'judul' => 'Kunjungan Baru Terdeteksi', 'deskripsi' => 'Remon Chin mendaftarkan kunjungan Humas.']
-];
+$notifikasi = [];
+
+/*
+|--------------------------------------------------------------------------
+| NOTIFIKASI KUNJUNGAN
+|--------------------------------------------------------------------------
+*/
+
+$qKunjungan = $conn->query("
+    SELECT
+        id,
+        nama_pengunjung,
+        keperluan
+    FROM kunjungan
+    WHERE status = 'menunggu'
+    ORDER BY id DESC
+    LIMIT 5
+");
+
+while ($row = $qKunjungan->fetch_assoc()) {
+
+    $notifikasi[] = [
+        'tipe' => 'kunjungan',
+        'judul' => 'Kunjungan Baru',
+        'deskripsi' =>
+            $row['nama_pengunjung'] .
+            ' mengajukan ' .
+            $row['keperluan']
+    ];
+}
+
+/*
+kajbsbdugawebgeksbdkjgb sdjg bsbglksdbbg ksdba
+ NOTIFIKASI PESAN
+asunfhiudhf uadhsfghdsgdkjgbsdgupsnsflkjasn
+*/
+
+$qInbox = $conn->query("
+    SELECT
+        nama_lengkap,
+        subjek
+    FROM inbox
+    WHERE status = 'Belum Dibaca'
+    ORDER BY id DESC
+    LIMIT 5
+");
+
+while ($row = $qInbox->fetch_assoc()) {
+
+    $notifikasi[] = [
+        'tipe' => 'pesan',
+        'judul' => 'Pesan Baru',
+        'deskripsi' =>
+            $row['nama_lengkap'] .
+            ' - ' .
+            $row['subjek']
+    ];
+}
+
+$jumlah_notif = count($notifikasi);
 $sqlCount = "
     SELECT COUNT(*) AS total
     FROM kunjungan
@@ -370,13 +421,30 @@ function build_page_url($page, $filter_id, $filter_tanggal, $filter_keperluan) {
                     </thead>
                     <tbody class="divide-y divide-gray-100" id="tableBodyData">
                         <?php foreach ($data_kunjungan as $row):
-                            $status = strtolower($row['status']);
-                            if ($status === 'in progress') { $badge_style = 'bg-purple-50 text-purple-500'; } 
-                            elseif ($status === 'complete' || $status === 'completed') { $badge_style = 'bg-green-50 text-green-500'; } 
-                            elseif ($status === 'pending') { $badge_style = 'bg-amber-50 text-amber-500'; } 
-                            elseif ($status === 'canceled') { $badge_style = 'bg-red-50 text-red-500'; } 
-                            elseif ($status === 'approved') { $badge_style = 'bg-blue-50 text-blue-500'; } 
-                            else { $badge_style = 'bg-gray-100 text-gray-500'; }
+
+                            $status = strtolower(trim($row['status']));
+
+                            if ($status === 'disetujui') {
+
+                                $badge_style =
+                                    'bg-green-50 text-green-600';
+
+                            } elseif ($status === 'ditolak') {
+
+                                $badge_style =
+                                    'bg-red-50 text-red-600';
+
+                            } elseif ($status === 'menunggu') {
+
+                                $badge_style =
+                                    'bg-yellow-50 text-yellow-600';
+
+                            } else {
+
+                                $badge_style =
+                                    'bg-gray-100 text-gray-500';
+                            }
+
                         ?>
                             <tr class="hover:bg-gray-50/50 transition table-row-item">
                                 <td class="py-5 text-[11px] font-bold text-gray-700 font-roboto break-words pr-2">
