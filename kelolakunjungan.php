@@ -36,10 +36,41 @@ $halaman_aktif = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
 if ($halaman_aktif < 1) { $halaman_aktif = 1; }
 
 $jumlah_notif = count($notifikasi);
+$filter_id_tamu   = isset($_GET['filter_id'])         ? trim($_GET['filter_id'])         : '';
+$filter_tanggal   = isset($_GET['filter_tanggal'])   ? trim($_GET['filter_tanggal'])   : '';
+$filter_keperluan = isset($_GET['filter_keperluan']) ? trim($_GET['filter_keperluan']) : '';
+
 $where = [];
 $params = [];
 $types = "";
+
+if ($filter_keperluan !== '') {
+
+    $where[] = "keperluan = ?";
+    $params[] = $filter_keperluan;
+    $types .= "s";
+}
+
+if ($filter_tanggal !== '') {
+
+    $where[] = "tanggal = ?";
+    $params[] = $filter_tanggal;
+    $types .= "s";
+}
+if ($filter_id_tamu !== '') {
+
+    $where[] = "id = ?";
+    $params[] = $filter_id_tamu;
+    $types .= "i";
+}
 $sqlWhere = "";
+
+if (!empty($where)) {
+
+    $sqlWhere =
+        " WHERE " .
+        implode(" AND ", $where);
+}
 $sqlCount =
     "SELECT COUNT(*) AS total
      FROM kunjungan"
@@ -118,27 +149,6 @@ while (
         $row;
 }
 
-$filter_id_tamu   = isset($_GET['filter_id'])         ? trim($_GET['filter_id'])         : '';
-$filter_tanggal   = isset($_GET['filter_tanggal'])   ? trim($_GET['filter_tanggal'])   : '';
-$filter_keperluan = isset($_GET['filter_keperluan']) ? trim($_GET['filter_keperluan']) : '';
-
-$where = [];
-$params = [];
-$types = "";
-
-if ($filter_keperluan !== '') {
-
-    $where[] = "keperluan = ?";
-    $params[] = $filter_keperluan;
-    $types .= "s";
-}
-
-if ($filter_tanggal !== '') {
-
-    $where[] = "tanggal = ?";
-    $params[] = $filter_tanggal;
-    $types .= "s";
-}
 if (!empty($where)) {
 
     $sqlWhere =
@@ -319,15 +329,15 @@ function build_page_url($page, $filter_id, $filter_tanggal, $filter_keperluan) {
                             </div>
                             <ul id="dropdownList" class="max-h-[160px] overflow-y-auto custom-scroll flex flex-col gap-0.5">
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="">Semua Keperluan</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Kunjungan Dinas">Mahasiswa</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Mahasiswa">Mahasiswa</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Kunjungan Perpustakaan">Kunjungan Perpustakaan</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">Janji Temu</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Kunjungan Dinas">Kunjungan Dinas</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Menghadiri Acara">Menghadiri Acara</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="UPT Perpustakaan">UPT Perpustakaan</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Tata Usaha">Tata Usaha</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Humas">Humas (Hubungan Masyarakat)</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="HIMA">HIMA (Himpunan Mahasiswa)</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Humas (Hubungan Masyarakat)">Humas (Hubungan Masyarakat)</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="HIMA (Himpunan Mahasiswa)">HIMA (Himpunan Mahasiswa)</li>
                             </ul>
                         </div>
                     </div>
