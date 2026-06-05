@@ -50,52 +50,6 @@ if (
     exit();
 }
 
-while ($row = $qKunjungan->fetch_assoc()) {
-
-    $notifikasi[] = [
-        'tipe' => 'kunjungan',
-        'judul' => 'Kunjungan Baru',
-        'deskripsi' =>
-            $row['nama_pengunjung'] .
-            ' mengajukan ' .
-            $row['keperluan']
-    ];
-}
-
-/*
-IAMSDJGPNWEFNKWEBFLBEWLNJSBLKBDKGHSBDG
-NOTIFIKASI PESAN
-NKUASDIFJAIUSDGYF ERIAFHBSKHDGILUDSLKL
-*/
-
-$stmtNotif = $conn->prepare("
-    SELECT
-        nama_lengkap,
-        subjek
-    FROM inbox
-    WHERE status = 'Belum Dibaca'
-    ORDER BY created_at DESC
-    LIMIT 5
-");
-
-$stmtNotif->execute();
-
-$resultNotif = $stmtNotif->get_result();
-
-while ($rowNotif = $resultNotif->fetch_assoc()) {
-
-    $notifikasi[] = [
-        'tipe' => 'pesan',
-        'judul' => 'Pesan Baru',
-        'deskripsi' =>
-            $rowNotif['nama_lengkap'] .
-            ' - ' .
-            $rowNotif['subjek']
-    ];
-}
-
-$jumlah_notif = count($notifikasi);
-
 $database_pesan = [];
 
 $query = $conn->query("
@@ -156,11 +110,11 @@ function formatWaktuPesan($datetime_str) {
 // --- HITUNG JUMLAH TOTAL REAL PER KATEGORI DARI ARRAY DUMMY ---
 $count_inbox = count($database_pesan);
 
-foreach ($database_pesan as $p) {
-    if (!$p['bin']) {
-        $count_inbox++;
-    }
-}
+// foreach ($database_pesan as $p) {
+//     if (!$p['bin']) {
+//         $count_inbox++;
+//     }
+// }
 
 // --- LOGIKA FILTER BERDASARKAN TAB ---
 $pesan_terfilter = $database_pesan;

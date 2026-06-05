@@ -94,4 +94,4 @@ $q2 = $conn->query("
 ");
 
 $jumlah_notif +=
-    (int)$q2->fetch_assoc()['total'];
+    (int)$q2->fetch_assoc()['total']/2;
