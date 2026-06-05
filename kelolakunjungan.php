@@ -10,12 +10,6 @@ date_default_timezone_set('Asia/Jakarta');
 require_once 'config.php';
 require_once 'notif.php';
 
-$resultCount = $conn->query($sqlCount);
-
-$total_data =
-    $resultCount
-    ->fetch_assoc()['total'];
-
 // --- LOGIKA FILTER & PAGINATION TABEL ---
 $jumlah_data_per_halaman = 9;
 $halaman_aktif = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
