@@ -681,16 +681,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 return;
             }
 
-            const emailInput = document.getElementById('email_tamu');
-            if (!emailInput.value.trim()) {
-                e.preventDefault();
-                markAsWarning(document.getElementById('container_email'));
-                globalError.textContent = "⚠️ Mohon isi E-mail Tamu terlebih dahulu!";
-                globalError.classList.remove('hidden');
-                emailInput.focus();
-                return;
-            }
-
             const phoneInput = document.getElementById('phone');
             if (!phoneInput.value.trim()) {
                 e.preventDefault();
