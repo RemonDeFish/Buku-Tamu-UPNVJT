@@ -3,7 +3,7 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
-
+require_once 'notif.php';
 // Admin harus login br bisa masuk sini.
 if (
     !isset($_SESSION['admin_id']) ||
@@ -188,7 +188,6 @@ if ($status == 'menunggu') {
     $badge =
         'bg-gray-100 text-gray-700';
 }
-require_once 'notif.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">

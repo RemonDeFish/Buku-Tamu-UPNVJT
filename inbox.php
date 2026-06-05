@@ -7,6 +7,7 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
+require_once 'notif.php';
 // admin harus login baru bisa akses
 if (
     !isset($_SESSION['admin_id']) ||
@@ -16,8 +17,6 @@ if (
     header("Location: adminlogin.php");
     exit();
 }
-
-require_once 'notif.php';
 
 while ($row = $qKunjungan->fetch_assoc()) {
 

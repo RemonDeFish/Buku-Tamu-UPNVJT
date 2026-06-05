@@ -3,6 +3,7 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
+require_once 'notif.php';
 $id = (int)($_GET['id'] ?? 0);
 
 $update = $conn->prepare("
@@ -54,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
             }
 }
-require_once 'notif.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">

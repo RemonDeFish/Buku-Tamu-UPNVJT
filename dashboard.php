@@ -7,6 +7,7 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
+require_once 'notif.php';
 // admin harus login baru bisa akses
 if (
     !isset($_SESSION['admin_id']) ||
@@ -124,7 +125,7 @@ while ($row = $result->fetch_assoc()) {
             . $row['waktu_selesai']
     ];
 }
-require_once 'notif.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
