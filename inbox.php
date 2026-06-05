@@ -18,6 +18,38 @@ if (
     exit();
 }
 
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    &&
+    isset($_POST['delete_selected'])
+) {
+    $ids = $_POST['selected_ids'] ?? [];
+    if (!empty($ids)) {
+        $ids = array_map('intval', $ids);
+        $placeholders = implode(
+            ',',
+            array_fill(
+                0,
+                count($ids),
+                '?'
+            )
+        );
+        $types = str_repeat('i',count($ids));
+        $stmt = $conn->prepare("
+            DELETE FROM inbox
+            WHERE id IN ($placeholders)
+        ");
+        $stmt->bind_param(
+            $types,
+            ...$ids
+        );
+        $stmt->execute();
+    }
+
+    header("Location: inbox.php");
+    exit();
+}
+
 while ($row = $qKunjungan->fetch_assoc()) {
 
     $notifikasi[] = [
@@ -227,7 +259,7 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
         </div>
 
         <div class="w-full bg-white rounded-2xl p-6 shadow-sm border border-gray-100 overflow-hidden">
-            
+            <form method="POST">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
                 <div class="flex gap-8 text-xs font-semibold text-gray-400">
                     <a href="inbox.php" class="flex items-center gap-2 pb-2 text-[#6a5750] border-b-2 border-[#6a5750]">
@@ -253,7 +285,7 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
                     </a>
                 </div>
                 
-                <button class="p-1 text-gray-400 hover:text-red-500 transition focus:outline-none flex items-center justify-center">
+                <button type="submit" name="delete_selected" onclick="return confirm('Hapus pesan yang dipilih?')" class="p-1 text-gray-400 hover:text-red-500 transition focus:outline-none flex items-center justify-center">
                     <img src="image/trash-icon.svg" class="w-4 h-4 opacity-75 hover:opacity-100 transition-opacity" alt="Delete Selected" />
                 </button>
             </div>
@@ -269,7 +301,7 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
                             <?php foreach ($pesan_halaman_ini as $row): ?>
                                 <tr class="hover:bg-gray-50/50 transition table-row-item cursor-pointer" data-id="<?= $row['id'] ?>">
                                     <td class="w-[4%] py-1.5 pl-2 text-center">
-                                        <input type="checkbox" class="w-4 h-4 accent-black rounded border-gray-300 focus:ring-0 checkbox-item" />
+                                        <input type="checkbox" name="selected_ids[]" value="<?= $row['id'] ?>" class="w-4 h-4 accent-black rounded border-gray-300 focus:ring-0 checkbox-item" />
                                     </td>
                                     <td class="w-[20%] py-1.5 text-xs font-bold text-gray-800 truncate px-2 search-target-nama">
                                         <?= htmlspecialchars($row['nama']) ?>
@@ -325,7 +357,7 @@ $pesan_halaman_ini = array_slice($pesan_terfilter, $offset, $limit);
                     </a>
                 <?php endif; ?>
             </div>
-
+            </form>
         </div>
     </main>
 
