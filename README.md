@@ -10,7 +10,6 @@ Website buku tamu digital untuk pendataan dan pengelolaan pengunjung kampus bese
 - Validasi Input Data (Error, Isi Form)
 - reCAPTCHA verification
 - Tiket Kunjungan Terdaftar Tamu
-- Pencarian Data Kunjungan Spesifik (Verifikasi OTP Email)
 - Status Kunjungan Tamu (Riwayat Kunjungan Tamu)
 
 ## Admin Features
