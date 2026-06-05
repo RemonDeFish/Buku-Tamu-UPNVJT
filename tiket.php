@@ -118,7 +118,7 @@ $waktu_display =
                 <p class="text-xs md:text-sm text-gray-500 font-medium mt-2">Gunakan QR Code di bawah untuk memverifikasi kedatangan Anda di lokasi</p>
             <?php else: ?>
                 <h1 class="text-3xl md:text-[40px] font-bold text-black tracking-tight">Pendaftaran Formulir Berhasil!</h1>
-                <p class="text-xs md:text-sm text-gray-500 font-medium mt-2">Tiket kunjungan telah dikirim dan dapat diunduh melalui E-mail Anda</p>
+                <p class="text-xs md:text-sm text-gray-500 font-medium mt-2">Pengunjung diharapkan langsung mengunduh atau mencetak tiket kunjungan</p>
             <?php endif; ?>
         </div>
 
