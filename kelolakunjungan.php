@@ -322,12 +322,12 @@ function build_page_url($page, $filter_id, $filter_tanggal, $filter_keperluan) {
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Kunjungan Dinas">Mahasiswa</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Kunjungan Perpustakaan">Kunjungan Perpustakaan</li>
                                 <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">Janji Temu</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">Kunjungan Dinas</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">Menghadiri Acara</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">UPT Perpustakaan</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">Tata Usaha</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">Humas (Hubungan Masyarakat)</li>
-                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Janji Temu">HIMA (Himpunan Mahasiswa)</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Kunjungan Dinas">Kunjungan Dinas</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Menghadiri Acara">Menghadiri Acara</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="UPT Perpustakaan">UPT Perpustakaan</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Tata Usaha">Tata Usaha</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="Humas">Humas (Hubungan Masyarakat)</li>
+                                <li class="item-opt px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-md cursor-pointer font-medium transition" data-value="HIMA">HIMA (Himpunan Mahasiswa)</li>
                             </ul>
                         </div>
                     </div>
