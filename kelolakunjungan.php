@@ -8,72 +8,7 @@ session_start();
 date_default_timezone_set('Asia/Jakarta');
 
 require_once 'config.php';
-
-// --- DATA NOTIFIKASI SIDEBAR ---
-$notifikasi = [];
-
-/*
-|--------------------------------------------------------------------------
-| NOTIFIKASI KUNJUNGAN
-|--------------------------------------------------------------------------
-*/
-
-$qKunjungan = $conn->query("
-    SELECT
-        id,
-        nama_pengunjung,
-        keperluan
-    FROM kunjungan
-    WHERE status = 'menunggu'
-    ORDER BY id DESC
-    LIMIT 5
-");
-
-while ($row = $qKunjungan->fetch_assoc()) {
-
-    $notifikasi[] = [
-        'tipe' => 'kunjungan',
-        'judul' => 'Kunjungan Baru',
-        'deskripsi' =>
-            $row['nama_pengunjung'] .
-            ' mengajukan ' .
-            $row['keperluan']
-    ];
-}
-
-/*
-kajbsbdugawebgeksbdkjgb sdjg bsbglksdbbg ksdba
- NOTIFIKASI PESAN
-asunfhiudhf uadhsfghdsgdkjgbsdgupsnsflkjasn
-*/
-
-$qInbox = $conn->query("
-    SELECT
-        nama_lengkap,
-        subjek
-    FROM inbox
-    WHERE status = 'Belum Dibaca'
-    ORDER BY id DESC
-    LIMIT 5
-");
-
-while ($row = $qInbox->fetch_assoc()) {
-
-    $notifikasi[] = [
-        'tipe' => 'pesan',
-        'judul' => 'Pesan Baru',
-        'deskripsi' =>
-            $row['nama_lengkap'] .
-            ' - ' .
-            $row['subjek']
-    ];
-}
-
-$jumlah_notif = count($notifikasi);
-$sqlCount = "
-    SELECT COUNT(*) AS total
-    FROM kunjungan
-";
+require_once 'notif.php';
 
 $resultCount = $conn->query($sqlCount);
 

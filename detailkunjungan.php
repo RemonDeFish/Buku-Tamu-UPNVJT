@@ -188,35 +188,7 @@ if ($status == 'menunggu') {
     $badge =
         'bg-gray-100 text-gray-700';
 }
-/*
-IAMSDJGPNWEFNKWEBFLBEWLNJSBLKBDKGHSBDG
-NOTIFIKASI PESAN
-NKUASDIFJAIUSDGYF ERIAFHBSKHDGILUDSLKL
-*/
-
-$qInbox = $conn->query("
-    SELECT
-        nama_lengkap,
-        subjek
-    FROM inbox
-    WHERE status = 'Belum Dibaca'
-    ORDER BY id DESC
-    LIMIT 5
-");
-
-while ($row = $qInbox->fetch_assoc()) {
-
-    $notifikasi[] = [
-        'tipe' => 'pesan',
-        'judul' => 'Pesan Baru',
-        'deskripsi' =>
-            $row['nama_lengkap'] .
-            ' - ' .
-            $row['subjek']
-    ];
-}
-
-$jumlah_notif = count($notifikasi);
+require_once 'notif.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">

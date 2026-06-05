@@ -17,24 +17,7 @@ if (
     exit();
 }
 
-$notifikasi = [];
-
-/*
-|--------------------------------------------------------------------------
-| NOTIFIKASI KUNJUNGAN
-|--------------------------------------------------------------------------
-*/
-
-$qKunjungan = $conn->query("
-    SELECT
-        id,
-        nama_pengunjung,
-        keperluan
-    FROM kunjungan
-    WHERE status = 'menunggu'
-    ORDER BY id DESC
-    LIMIT 5
-");
+require_once 'notif.php';
 
 while ($row = $qKunjungan->fetch_assoc()) {
 
@@ -53,30 +36,6 @@ IAMSDJGPNWEFNKWEBFLBEWLNJSBLKBDKGHSBDG
 NOTIFIKASI PESAN
 NKUASDIFJAIUSDGYF ERIAFHBSKHDGILUDSLKL
 */
-
-$qInbox = $conn->query("
-    SELECT
-        nama_lengkap,
-        subjek
-    FROM inbox
-    WHERE status = 'Belum Dibaca'
-    ORDER BY id DESC
-    LIMIT 5
-");
-
-while ($row = $qInbox->fetch_assoc()) {
-
-    $notifikasi[] = [
-        'tipe' => 'pesan',
-        'judul' => 'Pesan Baru',
-        'deskripsi' =>
-            $row['nama_lengkap'] .
-            ' - ' .
-            $row['subjek']
-    ];
-}
-
-$jumlah_notif = count($notifikasi);
 
 $stmtNotif = $conn->prepare("
     SELECT
