@@ -26,7 +26,13 @@ Website buku tamu digital untuk pendataan dan pengelolaan pengunjung kampus bese
 
 ## Tech Stack
 ## Front-End
+- Tailwind CSS
+- HTML5
+- JavaScript
+- ChartJS
 ## Back-End
+- PHP
+- MySQL
 
 ---
 
