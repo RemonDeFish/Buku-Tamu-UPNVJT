@@ -41,3 +41,11 @@ Website buku tamu digital untuk pendataan dan pengelolaan pengunjung kampus bese
 Tamu membuka website -> Mengisi form kunjungan Tamu -> Validasi data -> Verifikasi captcha -> Data tersimpan -> Tamu dapat melihat Status Pengunjung menggunakan validasi E-mail.
 ## Admin
 Admin membuka website -> Masuk Admin -> Verifikasi captcha -> Pengecekan Statistik dan Kunjungan cepat -> Kelola Kunjungan -> View Tamu (Edit, Save, Delete, Terima Kunjungan, Tolak).
+
+--
+
+## Preview Website
+<img width="924" height="519" alt="image" src="https://github.com/user-attachments/assets/650203af-1d91-48f4-bdab-9e3193c1c445" />
+<img width="975" height="554" alt="image" src="https://github.com/user-attachments/assets/3ee19e01-6df2-4bef-8b01-b9ed6b6fddd5" />
+
+
